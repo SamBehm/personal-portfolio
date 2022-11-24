@@ -1,10 +1,9 @@
 import './style.css'
 import * as THREE from 'three';
-import { TorusGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-
-// Scene, Camera, Renderer Setup ---------------------------|
+// Scene, Camera, Renderer, Loader Setup ---------------------------|
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -14,8 +13,11 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.physicallyCorrectLights = true;
 
 camera.position.setZ(30);
+
+const loader = new GLTFLoader();
 
 // ---------------------------------------------------------|
 
@@ -28,21 +30,23 @@ camera.position.setZ(30);
 function animate() {
   requestAnimationFrame(animate);
 
-  // controls.update();
+  controls.update();
 
   renderer.render(scene, camera);
 }
 
-const pLight = new THREE.PointLight(0xFFFFFF);
-pLight.position.set(20, 20, 20);
+const controls = new OrbitControls(camera, renderer.domElement);
 
-const aLight = new THREE.AmbientLight(0xFFFFFF);
+const axesHelper = new THREE.AxesHelper(20);
+scene.add(axesHelper);
 
-scene.add(pLight, aLight);
+loader.load('/room.glb', function (gltf) {
+  scene.add(gltf.scene);
 
-const gridHelper = new THREE.GridHelper();
-// const controls = new OrbitControls(camera, renderer.domElement);
+}, undefined, function (error) {
+  console.error(error);
+});
 
-scene.add(gridHelper);
+
 
 animate();
