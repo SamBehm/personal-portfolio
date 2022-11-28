@@ -42,6 +42,9 @@ const axesHelper = new THREE.AxesHelper(20);
 scene.add(axesHelper);
 
 loader.load('/room.glb', function (gltf) {
+  var material = gltf.material;
+  material.metalness = 0;
+  material.roughness = 1;
   scene.add(gltf.scene);
 
 }, undefined, function (error) {
@@ -52,11 +55,11 @@ loader.load('/room.glb', function (gltf) {
 const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xFF9C36, 1, 60, 20, 0);
+const spotLight = new THREE.SpotLight(0xFF9C36, 20, 40, 1, 0.6, 0.2);
 
 spotLight.castShadow = true;
 
-spotLight.position.set(-19, 4, 3);
+spotLight.position.set(-16, 4, 3);
 spotLight.target.position.set(0, 0, 10);
 spotLight.target.updateMatrixWorld();
 
@@ -72,13 +75,13 @@ scene.add(spotLight);
 const slHelper = new THREE.SpotLightHelper(spotLight);
 scene.add(slHelper);
 
-// const directionalLight = new THREE.DirectionalLight(0xFDB816, 10);
-// directionalLight.position.set(-16, 4, 3);
-// directionalLight.castShadow = true;
-// scene.add(directionalLight);
+// const pointLight = new THREE.PointLight(0xFF9CD6, 100, 40, 2);
 
-// const dlHelper = new THREE.DirectionalLightHelper(directionalLight);
-// scene.add(dlHelper);
+// pointLight.position.set(-16, 3.6, 3);
+// scene.add(pointLight);
+
+// const plHelper = new THREE.PointLightHelper(pointLight);
+// scene.add(plHelper);
 
 
 animate();
