@@ -50,10 +50,10 @@ loader.load('/room.glb', function (gltf) {
 });
 
 
-const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xFF9C36, 5, 40, Math.PI / 2, 1, 0.1);
+const spotLight = new THREE.SpotLight(0xFF9C36, 7, 40, Math.PI / 2, 1, 0.1);
 
 spotLight.castShadow = true;
 
@@ -73,12 +73,14 @@ scene.add(spotLight);
 // const slHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(slHelper);
 
-let pointLight = new THREE.PointLight(0xFF9C36, 1.5, 40, 0.01);
+let pointLight = new THREE.PointLight(0xFF9C36, 4, 40, 0.05);
+let pointLightShelf = pointLight;
 pointLight.position.set(15, 15, 30);
+pointLightShelf.position.set(-14, 10, 14);
 
 scene.add(pointLight);
 
-// let plHelper = new THREE.PointLightHelper(pointLight);
+// let plHelper = new THREE.PointLightHelper(pointLightShelf);
 // scene.add(plHelper);
 
 animate();
