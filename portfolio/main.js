@@ -6,9 +6,9 @@ import { DirectionalLightHelper, SpotLightHelper } from 'three';
 
 // Scene, Camera, Renderer, Loader Setup ---------------------------|
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x594F3B);
+scene.background = new THREE.Color(0x303030);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
@@ -50,10 +50,10 @@ loader.load('/room.glb', function (gltf) {
 });
 
 
-const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xFF9C36, 4, 40, Math.PI / 2, 1, 0.1);
+const spotLight = new THREE.SpotLight(0xFF9C36, 5, 40, Math.PI / 2, 1, 0.1);
 
 spotLight.castShadow = true;
 
@@ -73,7 +73,7 @@ scene.add(spotLight);
 // const slHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(slHelper);
 
-let pointLight = new THREE.PointLight(0xFF9C36, 2, 40, 0.01);
+let pointLight = new THREE.PointLight(0xFF9C36, 1.5, 40, 0.01);
 pointLight.position.set(15, 15, 30);
 
 scene.add(pointLight);
