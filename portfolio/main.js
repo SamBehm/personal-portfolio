@@ -39,8 +39,8 @@ function animate() {
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-const axesHelper = new THREE.AxesHelper(20);
-scene.add(axesHelper);
+// const axesHelper = new THREE.AxesHelper(20);
+// scene.add(axesHelper);
 
 loader.load('/room.glb', function (gltf) {
   scene.add(gltf.scene);
@@ -72,5 +72,13 @@ scene.add(spotLight);
 
 // const slHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(slHelper);
+
+let pointLight = new THREE.PointLight(0xFF9C36, 2, 40, 0.01);
+pointLight.position.set(15, 15, 30);
+
+scene.add(pointLight);
+
+// let plHelper = new THREE.PointLightHelper(pointLight);
+// scene.add(plHelper);
 
 animate();
