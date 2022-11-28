@@ -6,6 +6,7 @@ import { DirectionalLightHelper, SpotLightHelper } from 'three';
 
 // Scene, Camera, Renderer, Loader Setup ---------------------------|
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x594F3B);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
@@ -42,9 +43,6 @@ const axesHelper = new THREE.AxesHelper(20);
 scene.add(axesHelper);
 
 loader.load('/room.glb', function (gltf) {
-  var material = gltf.material;
-  material.metalness = 0;
-  material.roughness = 1;
   scene.add(gltf.scene);
 
 }, undefined, function (error) {
@@ -52,15 +50,15 @@ loader.load('/room.glb', function (gltf) {
 });
 
 
-const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xFF9C36, 20, 40, 1, 0.6, 0.2);
+const spotLight = new THREE.SpotLight(0xFF9C36, 4, 40, Math.PI / 2, 1, 0.1);
 
 spotLight.castShadow = true;
 
 spotLight.position.set(-16, 4, 3);
-spotLight.target.position.set(0, 0, 10);
+spotLight.target.position.set(0, 0, 15);
 spotLight.target.updateMatrixWorld();
 
 spotLight.shadow.mapSize.width = 1024;
@@ -72,16 +70,7 @@ spotLight.shadow.camera.fov = 30;
 
 scene.add(spotLight);
 
-const slHelper = new THREE.SpotLightHelper(spotLight);
-scene.add(slHelper);
-
-// const pointLight = new THREE.PointLight(0xFF9CD6, 100, 40, 2);
-
-// pointLight.position.set(-16, 3.6, 3);
-// scene.add(pointLight);
-
-// const plHelper = new THREE.PointLightHelper(pointLight);
-// scene.add(plHelper);
-
+// const slHelper = new THREE.SpotLightHelper(spotLight);
+// scene.add(slHelper);
 
 animate();
