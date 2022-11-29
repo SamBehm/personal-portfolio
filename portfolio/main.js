@@ -43,7 +43,11 @@ const controls = new OrbitControls(camera, renderer.domElement);
 // scene.add(axesHelper);
 
 loader.load('/room.glb', function (gltf) {
-  scene.add(gltf.scene);
+
+  gltf.scene.traverse(function (object) {
+    console.log(object);
+  });
+
 
 }, undefined, function (error) {
   console.error(error);
