@@ -2,4 +2,21 @@
   position: fixed;
   top: 0;
   left: 0;
+  color: black;
+  background-color: black;
+}
+
+html,
+body,
+header {
+  background-color: black;
+}
+
+#screen-console {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  color: black;
+  background-color: black;
 }
