@@ -4,6 +4,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DirectionalLightHelper, SpotLightHelper } from 'three';
 
+
+const speed = 75;
+const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
+  "Cloning into 'personal-portfolio'...",
+  "remote: Enumerating objects: 306, done.",
+  "remote: Counting objects: 100% (306/306), done.",
+  "remote: Compressing objects: 100% (184/184), done.",
+  "remote: Total 306 (delta 143), reused 280 (delta 117), pack-reused 0;",
+  "Receiving objects: 100% (306/306), 2.38 MiB | 3.06 MiB/s, done.",
+  "Resolving deltas: 100% (143/143), done.",
+  "Welcome!"];
+
 // Scene, Camera, Renderer Setup ---------------------------|
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x303030);
@@ -21,73 +33,95 @@ camera.position.set(-0.30, 1.9, 1.8);
 camera.rotation.set(-0.06, 0, 0);
 camera.updateProjectionMatrix();
 
-// ---------------------------------------------------------|
-
-/**
- * Debugging features (axes, camera controls, etc.)
- */
-// const controls = new OrbitControls(camera, renderer.domElement);
-// const axesHelper = new THREE.AxesHelper(20);
-// scene.add(axesHelper);
-
-
-/**
- * Loading Models from Blender GLTF Export
- */
-
 var models = {};
 const loader = new GLTFLoader();
 
-loader.load('/room.glb', function (gltf) {
-
-  scene.add(gltf.scene);
-
-  // Code Below is for possible splitting of models to allow for
-  // seperate animations and such.
-
-  /*gltf.scene.traverse(function (object) {
-    if (object.name) {
-      models[object.name] = object;
-      console.log(object.name);
-      scene.add(object);
-    }
-  });*/
-
-}, undefined, function (error) {
-  console.error(error);
-});
+initScreen();
 
 
-console.log(models);
+/**
+ * Function used to display loading screen on `console`, while models are being loaded.
+ */
+async function initScreen() {
+  await printPreamble();
+  loadModels();
+  await new Promise(r => setTimeout(r, 1000));
+  document.querySelector("#screen-console").style.display = 'none';
+  setupLighting();
+  animate();
+}
+
+async function printPreamble() {
+
+  var screenConsole = document.querySelector("#screen-console");
+  screenConsole.innerHTML = ">" + '<span id="blinker">\u25ae</span>';
+
+  for (let pos = 1; pos < console_text[0].length; pos++) {
+    screenConsole.innerHTML = console_text[0].substring(0, pos) + '<span id="blinker">\u25ae</span>';
+    await new Promise(r => setTimeout(r, speed));
+  }
+
+  screenConsole.innerHTML = console_text[0] + '<br/>';
+
+  for (let lineNum = 1; lineNum < console_text.length; lineNum++) {
+    screenConsole.innerHTML += console_text[lineNum] + '<br/>';
+    await new Promise(r => setTimeout(r, Math.floor(Math.random() * 501)));
+  }
+}
+
+
+function loadModels() {
+  loader.load('/room.glb', function (gltf) {
+
+    scene.add(gltf.scene);
+
+    // Code Below is for possible splitting of models to allow for
+    // seperate animations and such.
+
+    /*gltf.scene.traverse(function (object) {
+      if (object.name) {
+        models[object.name] = object;
+        console.log(object.name);
+        scene.add(object);
+      }
+    });*/
+
+  }, undefined, function (error) {
+    console.error(error);
+  });
+}
 
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-scene.add(ambientLight);
+function setupLighting() {
 
-const spotLight = new THREE.SpotLight(0xFF9C36, 7, 40, Math.PI / 2, 1, 0.1);
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+  scene.add(ambientLight);
 
-spotLight.castShadow = true;
+  const spotLight = new THREE.SpotLight(0xFF9C36, 7, 40, Math.PI / 2, 1, 0.1);
 
-spotLight.position.set(-16, 4, 3);
-spotLight.target.position.set(0, 0, 15);
-spotLight.target.updateMatrixWorld();
+  spotLight.castShadow = true;
 
-spotLight.shadow.mapSize.width = 1024;
-spotLight.shadow.mapSize.Height = 1024;
+  spotLight.position.set(-16, 4, 3);
+  spotLight.target.position.set(0, 0, 15);
+  spotLight.target.updateMatrixWorld();
 
-spotLight.shadow.camera.near = 500;
-spotLight.shadow.camera.far = 4000;
-spotLight.shadow.camera.fov = 30;
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.Height = 1024;
 
-scene.add(spotLight);
+  spotLight.shadow.camera.near = 500;
+  spotLight.shadow.camera.far = 4000;
+  spotLight.shadow.camera.fov = 30;
 
-let pointLight = new THREE.PointLight(0xFF9C36, 4, 40, 0.05);
-let pointLightShelf = pointLight;
-pointLight.position.set(15, 15, 30);
-pointLightShelf.position.set(-14, 10, 14);
+  scene.add(spotLight);
 
-scene.add(pointLight);
+  let pointLight = new THREE.PointLight(0xFF9C36, 4, 40, 0.05);
+  let pointLightShelf = pointLight;
+  pointLight.position.set(15, 15, 30);
+  pointLightShelf.position.set(-14, 10, 14);
+
+  scene.add(pointLight);
+}
 
 
 /**
@@ -102,5 +136,3 @@ function animate() {
 
   renderer.render(scene, camera);
 }
-
-animate();
