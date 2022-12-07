@@ -1,5 +1,6 @@
 import './style.css'
 import * as THREE from 'three';
+import gsap from 'gsap';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DirectionalLightHelper, SpotLightHelper } from 'three';
@@ -20,7 +21,7 @@ const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x303030);
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
@@ -33,8 +34,19 @@ camera.position.set(-0.30, 1.9, 1.8);
 camera.rotation.set(-0.06, 0, 0);
 camera.updateProjectionMatrix();
 
+var gltfScene;
 var models = {};
 const loader = new GLTFLoader();
+
+var initDollyComplete = false;
+
+// const controls = new OrbitControls(camera, renderer.domElement);
+// controls.object.position.set(52.39856489618762, 55.69405045162902, 66.79870509161366);
+// controls.addEventListener("change", event => {
+//   console.log(controls.object.position);
+//   console.log(controls.object.rotation);
+// });
+
 
 initScreen();
 
@@ -50,10 +62,9 @@ async function initScreen() {
   if (!modelsLoaded) {
     document.querySelector("#screen-console-text").innerHTML += "Error! Failed to load Models";
   }
-  await new Promise(r => setTimeout(r, 1000));
+  await new Promise(r => setTimeout(r, 500));
   document.querySelector("#screen-console").style.display = 'none';
   setupLighting();
-
   animate();
 }
 
@@ -80,7 +91,8 @@ function loadModels() {
   return new Promise((resolve, reject) => {
     loader.load('/room.glb', function (gltf) {
 
-      scene.add(gltf.scene);
+      gltfScene = gltf.scene;
+      scene.add(gltfScene);
 
       // Code Below is for possible splitting of models to allow for
       // seperate animations and such.
@@ -103,10 +115,12 @@ function loadModels() {
 }
 
 
+
+
 // Lighting
 function setupLighting() {
 
-  const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
   scene.add(ambientLight);
 
   const spotLight = new THREE.SpotLight(0xFF9C36, 7, 40, Math.PI / 2, 1, 0.1);
@@ -135,6 +149,43 @@ function setupLighting() {
 }
 
 
+/*
+58.58021594401725
+35.809561983910775
+71.11938785360569
+
+-0.5410995928728004
+0.698875756431121
+0.368910029539352
+*/
+
+function initDolly() {
+
+  gsap.to(camera.position, {
+    duration: 5,
+    ease: "power1.in",
+    z: 71.11938785360569
+  });
+
+  gsap.to(camera.position, {
+    duration: 4,
+    delay: 1,
+    ease: "power3.in",
+    x: 58.58021594401725,
+    y: 35.809561983910775
+  });
+
+  gsap.to(camera.rotation, {
+    x: -0.5410995928728004,
+    y: 0.698875756431121,
+    z: 0.368910029539352,
+    duration: 4,
+    delay: 1,
+    ease: "power2.in",
+    onComplete: () => { initDollyComplete = true }
+  });
+}
+
 /**
  * Animation Loop
  * 
@@ -142,6 +193,10 @@ function setupLighting() {
  */
 function animate() {
   requestAnimationFrame(animate);
+
+  if (!initDollyComplete) {
+    initDolly();
+  }
 
   // controls.update();
   renderer.render(scene, camera);
