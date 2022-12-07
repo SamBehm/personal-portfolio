@@ -16,10 +16,14 @@ body,
 
 #screen-console {
   position: absolute;
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  width: 97%;
   height: 100%;
+  margin-left: 3%;
   z-index: 100;
-  display: block;
   color: white;
   font-family: monospace;
   font-size: 150%;

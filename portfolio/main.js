@@ -48,12 +48,13 @@ async function initScreen() {
   await new Promise(r => setTimeout(r, 1000));
   document.querySelector("#screen-console").style.display = 'none';
   setupLighting();
+
   animate();
 }
 
 async function printPreamble() {
 
-  var screenConsole = document.querySelector("#screen-console");
+  var screenConsole = document.querySelector("#screen-console-text");
   screenConsole.innerHTML = ">" + '<span id="blinker">\u25ae</span>';
 
   for (let pos = 1; pos < console_text[0].length; pos++) {
@@ -133,6 +134,5 @@ function animate() {
   requestAnimationFrame(animate);
 
   // controls.update();
-
   renderer.render(scene, camera);
 }
