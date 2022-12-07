@@ -43,8 +43,13 @@ initScreen();
  * Function used to display loading screen on `console`, while models are being loaded.
  */
 async function initScreen() {
+
+  let modelsLoaded = loadModels();
   await printPreamble();
-  loadModels();
+  await modelsLoaded;
+  if (!modelsLoaded) {
+    document.querySelector("#screen-console-text").innerHTML += "Error! Failed to load Models";
+  }
   await new Promise(r => setTimeout(r, 1000));
   document.querySelector("#screen-console").style.display = 'none';
   setupLighting();
@@ -72,23 +77,28 @@ async function printPreamble() {
 
 
 function loadModels() {
-  loader.load('/room.glb', function (gltf) {
+  return new Promise((resolve, reject) => {
+    loader.load('/room.glb', function (gltf) {
 
-    scene.add(gltf.scene);
+      scene.add(gltf.scene);
 
-    // Code Below is for possible splitting of models to allow for
-    // seperate animations and such.
+      // Code Below is for possible splitting of models to allow for
+      // seperate animations and such.
 
-    /*gltf.scene.traverse(function (object) {
-      if (object.name) {
-        models[object.name] = object;
-        console.log(object.name);
-        scene.add(object);
-      }
-    });*/
+      /*gltf.scene.traverse(function (object) {
+        if (object.name) {
+          models[object.name] = object;
+          console.log(object.name);
+          scene.add(object);
+        }
+      });*/
 
-  }, undefined, function (error) {
-    console.error(error);
+    }, undefined, function (error) {
+      console.error(error);
+      resolve(false);
+    });
+
+    resolve(true);
   });
 }
 
