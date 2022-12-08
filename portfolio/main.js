@@ -4,7 +4,10 @@ import gsap from 'gsap';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DirectionalLightHelper, SpotLightHelper } from 'three';
+import { CustomEase } from "gsap/CustomEase";
+import gsapCore from 'gsap/gsap-core';
 
+gsap.registerPlugin(CustomEase);
 
 const speed = 75;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -161,29 +164,27 @@ function setupLighting() {
 
 function initDolly() {
 
-  gsap.to(camera.position, {
-    duration: 5,
-    ease: "power1.in",
+  var tl = gsap.timeline({ onComplete: () => { initDollyComplete = true } });
+  tl.to(camera.position, {
+    duration: 2.4,
+    ease: CustomEase.create("custom", "M0,0,C0.505,0.201,0.424,0.79,0.999,0.999,0.999,0.999,0.999,0.999,1,1"),
     z: 71.11938785360569
   });
 
-  gsap.to(camera.position, {
-    duration: 4,
-    delay: 1,
-    ease: "power3.in",
+  tl.to(camera.position, {
+    duration: 2.2,
+    ease: CustomEase.create("custom", "M0,0,C0.956,0,0.822,1,1,1"),
     x: 58.58021594401725,
     y: 35.809561983910775
-  });
+  }, 0.2);
 
-  gsap.to(camera.rotation, {
+  tl.to(camera.rotation, {
+    duration: 2.15,
+    ease: CustomEase.create("custom", "M0,0,C0.78,0.016,0.768,0.996,0.998,0.996,0.999,0.998,1,1,1,1"),
     x: -0.5410995928728004,
     y: 0.698875756431121,
-    z: 0.368910029539352,
-    duration: 4,
-    delay: 1,
-    ease: "power2.in",
-    onComplete: () => { initDollyComplete = true }
-  });
+    z: 0.368910029539352
+  }, 0.2);
 }
 
 /**
@@ -195,6 +196,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   if (!initDollyComplete) {
+    console.log("animating");
     initDolly();
   }
 
@@ -211,5 +213,4 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 
   renderer.setSize(window.innerWidth, window.innerHeight);
-
 }
