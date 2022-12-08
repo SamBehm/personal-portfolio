@@ -9,7 +9,7 @@ import gsapCore from 'gsap/gsap-core';
 
 gsap.registerPlugin(CustomEase);
 
-const speed = 75;
+const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
   "Cloning into 'personal-portfolio'...",
   "remote: Enumerating objects: 306, done.",
@@ -61,7 +61,6 @@ async function initScreen() {
 
   let modelsLoaded = loadModels();
   await printPreamble();
-  await modelsLoaded;
   if (!modelsLoaded) {
     document.querySelector("#screen-console-text").innerHTML += "Error! Failed to load Models";
   }
