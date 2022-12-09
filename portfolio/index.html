@@ -5,19 +5,32 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Vite App</title>
 </head>
 
 <body>
-  <script type="module" src="/main.js"></script>
-  <div id="container">
-    <canvas id="bg"></canvas>
-    <div id="screen-console">
-      <span id="screen-console-text"></span>
-    </div>
+  <div id="loadOverlay"
+    style="background-color:black; position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:2000;"></div>
+  <div id="div-screen-console" class="fullscreen-black">
+    <span id="screen-console-text"></span>
   </div>
 
+  <div id="div-wrapper" class="fullscreen-black">
+    <section class="section-header">
+      <div id="div-header">
+        <h1>Hello World!</h1>
+      </div>
+    </section>
+    <section>
+      <div id="div-content-container">
+        <div id="div-canvas-container">
+          <canvas id="model-viewer"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="/main.js"></script>
 </body>
 
 </html>
