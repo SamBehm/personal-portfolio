@@ -40,13 +40,13 @@ export function setupCanvas() {
 
         canvas = document.querySelector('#model-viewer');
 
-        camera = new THREE.PerspectiveCamera(30, canvas.innerWidth / canvas.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(30, 2, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({
                 canvas: canvas,
         });
 
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.physicallyCorrectLights = true;
 
         camera.position.set(-0.30, 1.9, 1.8);
@@ -171,5 +171,5 @@ function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 }
