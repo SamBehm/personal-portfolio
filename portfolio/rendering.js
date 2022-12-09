@@ -23,20 +23,15 @@ var loader;
 
 var initDollyComplete = false;
 
+// var controls;
+
 // -------------------------------------------|
 
-/* Debugging Controls commented out below - remember to uncomment update in animation function */
 
-// const controls = new OrbitControls(camera, renderer.domElement);
-// controls.object.position.set(52.39856489618762, 55.69405045162902, 66.79870509161366);
-// controls.addEventListener("change", event => {
-//   console.log(controls.object.position);
-//   console.log(controls.object.rotation);
-// });
 
 export function setupCanvas() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x303030);
+        scene.background = new THREE.Color(0xfbe0a0);
 
         canvas = document.querySelector('#model-viewer');
 
@@ -46,7 +41,7 @@ export function setupCanvas() {
         });
 
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.physicallyCorrectLights = true;
 
         camera.position.set(-0.30, 1.9, 1.8);
@@ -57,6 +52,15 @@ export function setupCanvas() {
         setupLighting();
 
         loader = new GLTFLoader();
+
+        /* Debugging Controls commented out below - remember to uncomment update in animation function */
+
+        // controls = new OrbitControls(camera, renderer.domElement);
+        // controls.addEventListener("change", event => {
+        //         console.log(controls.object.position);
+        //         console.log(controls.object.rotation);
+        // });
+
 
         return loadModels();
 }
@@ -130,14 +134,14 @@ function initDolly() {
         tl.to(camera.position, {
                 duration: 2.4,
                 ease: CustomEase.create("custom", "M0,0,C0.505,0.201,0.424,0.79,0.999,0.999,0.999,0.999,0.999,0.999,1,1"),
-                z: 71.11938785360569
+                z: 73
         });
 
         tl.to(camera.position, {
                 duration: 2.2,
                 ease: CustomEase.create("custom", "M0,0,C0.956,0,0.822,1,1,1"),
                 x: 58.58021594401725,
-                y: 35.809561983910775
+                y: 37.2
         }, 0.2);
 
         tl.to(camera.rotation, {
@@ -171,5 +175,5 @@ function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
 }
