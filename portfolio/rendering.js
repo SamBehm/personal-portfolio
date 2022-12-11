@@ -21,7 +21,28 @@ var gltfScene;
 var models = {};
 var loader;
 
+var pointLightShelf;
+
 var initDollyComplete = false;
+
+var slideDict = { /* directions are added in case I wanna slide objects in based on an axis */
+        "PC": "z",
+        "Shelves": "y",
+        "Bookshelf": "y",
+        "Rug": "z",
+        "Bed": "y",
+        "Dog Bed": "y",
+        "Chair": "z",
+        "Lamp": "y",
+        "Sticky Note": "y",
+        "Whiteboard": "x",
+        "Pillow1": "y",
+        "Pillow 2": "y",
+        "Armature": "y",
+        "Whiteboard": "x",
+        "Book": "x"
+}
+
 
 // var controls;
 
@@ -68,21 +89,23 @@ export function setupCanvas() {
 function loadModels() {
         return new Promise((resolve, reject) => {
                 loader.load('/room.glb', function (gltf) {
-
                         gltfScene = gltf.scene;
+                        let children = gltfScene.children;
+                        for (let i = 0; i < children.length; i++) {
+                                // console.log(children[i].userData.name);
+                                models[children[i].userData.name] = children[i];
+                                switch (children[i].userData.name) {
+                                        case 'Desk':
+                                        case 'Room':
+                                        case 'Monitor':
+                                                break;
+                                        default:
+                                                setOpacity(children[i]);
+                                }
+                        }
+
+                        console.log(models);
                         scene.add(gltfScene);
-
-                        // Code Below is for possible splitting of models to allow for
-                        // seperate animations and such.
-
-                        /*gltf.scene.traverse(function (object) {
-                          if (object.name) {
-                            models[object.name] = object;
-                            console.log(object.name);
-                            scene.add(object);
-                          }
-                        });*/
-
                 }, undefined, function (error) {
                         console.error(error);
                         resolve(false);
@@ -90,6 +113,25 @@ function loadModels() {
 
                 resolve(true);
         });
+}
+
+function setOpacity(object) {
+        switch (object.userData.name) {
+                case 'Armature':
+                        object.children[3].material.transparent = true;
+                        object.children[3].material.opacity = 0;
+                        break;
+                case 'Lamp':
+                        object.children[0].material.transparent = true;
+                        object.children[1].material.transparent = true;
+                        object.children[0].material.opacity = 0;
+                        object.children[1].material.opacity = 0;
+                        break;
+                default:
+                        object.material.transparent = true;
+                        object.material.opacity = 0;
+
+        }
 }
 
 /**
@@ -117,12 +159,81 @@ function setupLighting() {
 
         scene.add(spotLight);
 
-        let pointLight = new THREE.PointLight(0xFF9C36, 4, 40, 0.05);
-        let pointLightShelf = pointLight;
-        pointLight.position.set(15, 15, 30);
+        pointLightShelf = new THREE.PointLight(0xFF9C36, 0, 40, 0.05);
         pointLightShelf.position.set(-14, 10, 14);
 
-        scene.add(pointLight);
+        scene.add(pointLightShelf);
+}
+
+function dropObjects() {
+        var objTl = gsap.timeline();
+        var i = 0;
+        for (const [key, value] of Object.entries(slideDict)) {
+                console.log(key);
+                /*switch (value) {
+                        case "x":
+                                objTl.from(models[key].position, {
+                                        x: 30,
+                                        ease: 'power2.out',
+                                        duration: 1
+                                }, i);
+                                break;
+                        case "y":
+                                objTl.from(models[key].position, {
+                                        y: 30,
+                                        ease: 'power2.out',
+                                        duration: 1
+                                }, i);
+                                break;
+                        case "z":
+                                objTl.from(models[key].position, {
+                                        z: 50,
+                                        ease: 'power2.in',
+                                        duration: 1
+                                }, i);
+                                break;
+                }*/
+                objTl.from(models[key].position, {
+                        y: 30,
+                        ease: 'power2.out',
+                        duration: 1
+                }, i);
+                if (key == "Armature") {
+                        objTl.to(models['Armature'].children[3].material, {
+                                opacity: 1,
+                                ease: 'power1.out',
+                                duration: 1
+                        }, i);
+                } else if (key == "Lamp") {
+                        objTl.to(models['Lamp'].children[0].material, {
+                                opacity: 1,
+                                ease: 'power1.out',
+                                duration: 1
+                        }, i);
+                        objTl.to(models['Lamp'].children[1].material, {
+                                opacity: 1,
+                                ease: 'power1.out',
+                                duration: 1
+                        }, i);
+                        objTl.from(pointLightShelf.position, {
+                                y: 30,
+                                ease: 'power1.out',
+                                duration: 1
+                        }, i);
+                        objTl.to(pointLightShelf, {
+                                intensity: 4,
+                                ease: 'power.out',
+                                duration: 1
+                        }, i);
+                } else {
+                        objTl.to(models[key].material, {
+                                opacity: 1,
+                                ease: 'power1.out',
+                                duration: 1
+                        }, i);
+                }
+                i += 0.2;
+        }
 }
 
 function displayNavBar() {
@@ -168,6 +279,7 @@ function initDolly() {
         }, 1);
 
         tl.call(displayNavBar, null, 3);
+        tl.call(dropObjects, null, 2.9);
 }
 
 /**
@@ -179,7 +291,6 @@ export function animate() {
         requestAnimationFrame(animate);
 
         if (!initDollyComplete) {
-                console.log("animating");
                 initDolly();
                 initDollyComplete = true;
         }

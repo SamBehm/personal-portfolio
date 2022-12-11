@@ -22,7 +22,7 @@ async function main() {
  */
 async function initLoadingScreen() {
   let canvasSetupComplete = setupCanvas();
-  // await printPreamble();
+  await printPreamble();
   await canvasSetupComplete;
   if (!canvasSetupComplete) {
     document.querySelector("#screen-console-text").innerHTML += '<span style="color:red">Error! Failed to load Models</span>';
