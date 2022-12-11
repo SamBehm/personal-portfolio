@@ -25,7 +25,9 @@ var pointLightShelf;
 
 var initDollyComplete = false;
 
-var slideDict = { /* directions are added in case I wanna slide objects in based on an axis */
+/* directions are added in case I wanna slide objects in 
+   based on an axis - see multiAxisSlide function */
+var slideDict = {
         "PC": "z",
         "Shelves": "y",
         "Bookshelf": "y",
@@ -100,7 +102,7 @@ function loadModels() {
                                         case 'Monitor':
                                                 break;
                                         default:
-                                                setOpacity(children[i]);
+                                                setOpacityZero(children[i]);
                                 }
                         }
 
@@ -115,7 +117,11 @@ function loadModels() {
         });
 }
 
-function setOpacity(object) {
+/**
+ * Sets the opacity of the given object to 0
+ * @param {*} object object to affect
+ */
+function setOpacityZero(object) {
         switch (object.userData.name) {
                 case 'Armature':
                         object.children[3].material.transparent = true;
@@ -165,39 +171,60 @@ function setupLighting() {
         scene.add(pointLightShelf);
 }
 
+/**
+ * Animates the mesh sliding into position on the given axis
+ * @param {GSAPTimeline} objTl Timeline of mesh transformations
+ * @param {String} name Name of the Mesh
+ * @param {String} axis transformation axis
+ * @param {int} time Time position of the animation 
+ */
+function multiAxisSlide(objTl, name, axis, time) {
+        switch (axis) {
+                case "x":
+                        objTl.from(models[name].position, {
+                                x: 30,
+                                ease: 'power2.out',
+                                duration: 1
+                        }, time);
+                        break;
+                case "y":
+                        objTl.from(models[name].position, {
+                                y: 30,
+                                ease: 'power2.out',
+                                duration: 1
+                        }, time);
+                        break;
+                case "z":
+                        objTl.from(models[name].position, {
+                                z: 50,
+                                ease: 'power2.in',
+                                duration: 1
+                        }, time);
+                        break;
+        }
+}
+
+/**
+ * Animates the mesh sliding down from the top of the screen
+ * @param {GSAPTimeline} objTl Timeline of mesh transformations
+ * @param {String} name Name of the Mesh
+ * @param {int} time Time position of the animation
+ */
+function singleAxisSlide(objTl, name, time) {
+        objTl.from(models[name].position, {
+                y: 30,
+                ease: 'power2.out',
+                duration: 1
+        }, time);
+}
+
 function dropObjects() {
         var objTl = gsap.timeline();
         var i = 0;
         for (const [key, value] of Object.entries(slideDict)) {
-                console.log(key);
-                /*switch (value) {
-                        case "x":
-                                objTl.from(models[key].position, {
-                                        x: 30,
-                                        ease: 'power2.out',
-                                        duration: 1
-                                }, i);
-                                break;
-                        case "y":
-                                objTl.from(models[key].position, {
-                                        y: 30,
-                                        ease: 'power2.out',
-                                        duration: 1
-                                }, i);
-                                break;
-                        case "z":
-                                objTl.from(models[key].position, {
-                                        z: 50,
-                                        ease: 'power2.in',
-                                        duration: 1
-                                }, i);
-                                break;
-                }*/
-                objTl.from(models[key].position, {
-                        y: 30,
-                        ease: 'power2.out',
-                        duration: 1
-                }, i);
+                // multiAxisSlide(objTl, key, value, i);
+                singleAxisSlide(objTl, key, i);
+
                 if (key == "Armature") {
                         objTl.to(models['Armature'].children[3].material, {
                                 opacity: 1,
