@@ -131,12 +131,13 @@ function displayNavBar() {
         let l3 = document.getElementById('l3');
         let logo = document.getElementById('nav-logo');
         let dnSwitch = document.getElementById('nav-switch');
+        let section = document.getElementById('section-header');
         l1.classList.add('header-fall');
         l2.classList.add('header-fall');
         l3.classList.add('header-fall');
         logo.classList.add('header-fall');
         dnSwitch.classList.add('header-fall');
-
+        section.classList.add('header-fall');
 }
 
 /**

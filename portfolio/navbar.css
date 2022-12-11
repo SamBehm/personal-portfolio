@@ -4,6 +4,7 @@ header {
         align-items: center;
         padding: 30px 9% 30px 10%;
         font-family: 'Raleway', sans-serif;
+        background-image: linear-gradient(#ffca4f, #fbe0a0);
 }
 
 header * {
@@ -17,6 +18,8 @@ header * {
 
 
 #section-header {
+        position: relative;
+        top: -500px;
         width: 100%;
 }
 
@@ -38,7 +41,7 @@ header * {
         display: inline-block;
         top: -500px;
         padding: 0px 15px;
-        animation-delay: 0.1s;
+        animation-delay: 0.15s;
 }
 
 #l2 {
@@ -48,7 +51,7 @@ header * {
 #nav-logo,
 #nav-switch {
         top: -500px;
-        animation-delay: 0.2s;
+        animation-delay: 0.35s;
 }
 
 .nav-links li:nth-child(2) a {
