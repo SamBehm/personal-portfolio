@@ -1,5 +1,5 @@
 import './style.css'
-import { setupCanvas, animate } from './rendering'
+import { setupCanvas, animate, initDolly } from './rendering'
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -14,6 +14,7 @@ const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio
 
 async function main() {
   await initLoadingScreen();
+  initDolly();
   animate();
 }
 

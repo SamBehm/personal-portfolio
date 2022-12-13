@@ -2,9 +2,8 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DirectionalLightHelper, SpotLightHelper } from 'three';
 import { CustomEase } from "gsap/CustomEase";
-import gsapCore from 'gsap/gsap-core';
+
 
 gsap.registerPlugin(CustomEase);
 
@@ -25,6 +24,9 @@ var pointLightShelf;
 
 var initDollyComplete = false;
 
+var mouse = { x: 0, y: 0 };
+var INTERSECTED;
+
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
 var slideDict = {
@@ -44,6 +46,8 @@ var slideDict = {
         "Whiteboard": "x",
         "Book": "x"
 }
+
+var yOrigins = {};
 
 
 // var controls;
@@ -85,7 +89,7 @@ export function setupCanvas() {
         //         console.log(controls.object.rotation);
         // });
 
-
+        document.addEventListener("mousemove", mouseMoveEvent, false);
         return loadModels();
 }
 
@@ -96,6 +100,7 @@ function loadModels() {
                         let children = gltfScene.children;
                         for (let i = 0; i < children.length; i++) {
                                 models[children[i].userData.name] = children[i];
+                                yOrigins[children[i].userData.name] = children[i].position.y;
                                 switch (children[i].userData.name) {
                                         case 'Desk':
                                         case 'Room':
@@ -105,6 +110,7 @@ function loadModels() {
                                                 setOpacityZero(children[i]);
                                 }
                         }
+                        console.log(yOrigins);
                         scene.add(gltfScene);
                 }, undefined, function (error) {
                         console.error(error);
@@ -290,7 +296,7 @@ function displayNavBar() {
 /**
  * This function defines the initial camera movement upon leaving the loading screen
  */
-function initDolly() {
+export function initDolly() {
 
         var tl = gsap.timeline();
         tl.to(camera.position, {
@@ -311,13 +317,64 @@ function initDolly() {
                 ease: CustomEase.create("custom", "M0,0,C0.78,0.016,0.768,0.996,0.998,0.996,0.999,0.998,1,1,1,1"),
                 x: -0.5410995928728004,
                 y: 0.698875756431121,
-                z: 0.368910029539352
+                z: 0.368910029539352,
+                onComplete: () => { initDollyComplete = true }
         }, 1);
 
         tl.call(displayNavBar, null, 3);
         tl.call(dropObjects, null, 2.9);
         tl.call(fadeIn, null, 2.9);
 }
+
+function tweenYOnHover(INTERSECTED, direction) {
+        if (!yOrigins[INTERSECTED.userData.name]) {
+                return;
+        }
+
+        let time, endPosition = yOrigins[INTERSECTED.userData.name];
+        if (direction < 0) {
+                time = (INTERSECTED.position - endPosition) / 2;
+        } else {
+                endPosition += 2;
+                time = (endPosition - INTERSECTED.position) / 2;
+        }
+        endPosition = direction < 0 ? endPosition : endPosition + 5;
+
+        gsap.to(INTERSECTED.position, {
+                y: endPosition,
+                duration: 1,
+                ease: "power1.out",
+                overwrite: true
+        });
+
+}
+
+function checkHover() {
+        var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
+        var raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        var intersectedObjects = raycaster.intersectObjects(scene.children);
+
+
+
+        if (intersectedObjects.length > 0) {
+                console.log(intersectedObjects[0].object);
+                if (intersectedObjects[0].object != INTERSECTED && intersectedObjects[0].object.parent.name != "Room") {
+                        if (INTERSECTED) {
+                                tweenYOnHover(INTERSECTED, -1);
+                        }
+                        INTERSECTED = intersectedObjects[0].object;
+                        tweenYOnHover(INTERSECTED, 1)
+                }
+        } else {
+                if (INTERSECTED) {
+                        tweenYOnHover(INTERSECTED, -1);
+                }
+                INTERSECTED = null;
+        }
+}
+
 
 /**
  * Animation Loop
@@ -327,12 +384,11 @@ function initDolly() {
 export function animate() {
         requestAnimationFrame(animate);
 
-        if (!initDollyComplete) {
-                initDolly();
-                initDollyComplete = true;
+        if (initDollyComplete) {
+                checkHover();
         }
-
         // controls.update();
+
         renderer.render(scene, camera);
 }
 
@@ -342,4 +398,10 @@ function onWindowResize() {
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function mouseMoveEvent(event) {
+        event.preventDefault();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 }
