@@ -1,4 +1,5 @@
 header {
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -16,72 +17,58 @@ header * {
         text-decoration: none;
 }
 
-
-#section-header {
-        position: relative;
-        top: -500px;
-        width: 100%;
-}
-
-.header-fall {
-        animation: drop 1s ease-out forwards;
-}
-
-@keyframes drop {
-        100% {
-                transform: translateY(500px)
-        }
-}
-
-.nav-links {
+ul {
         list-style: none;
 }
 
-.nav-links li {
-        display: inline-block;
+#section-header {
+        width: 100%;
+        position: relative;
         top: -500px;
-        padding: 0px 15px;
-        animation-delay: 0.15s;
 }
 
-#l2 {
-        animation-delay: 0s;
-}
-
-#nav-logo,
-#nav-switch {
+header h1 {
         top: -500px;
         animation-delay: 0.35s;
 }
 
-.nav-links li:nth-child(2) a {
+.nav-containers {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+}
+
+.center {
+        flex: 10;
+}
+
+.nav-center-links li {
+        top: -500px;
+        display: inline-block;
+        padding: 0px 15px;
+        animation-delay: 0.15s;
+}
+
+.nav-center-links li:nth-child(2) a {
         font-size: 35px;
         font-weight: 1000;
 }
 
-.nav-links li a {
+.nav-center-links li:nth-child(2) {
+        animation-delay: 0s;
+}
+
+.nav-center-links li a {
         display: inline-block;
         transition: all 0.6s ease 0s;
 }
 
-/* .nav-links li a:hover {
-        text-shadow:
-                -1px -1px 0 white,
-                1px -1px 0 white,
-                -1px 1px 0 white,
-                1px 1px 0 white;
-        -webkit-transition: all .5s;
-        -moz-transition: all .5s;
-        -o-transition: all .5s;
-        transition: all .5s;
-} */
-
-.nav-links li a:hover::after {
+.nav-center-links li a:hover::after {
         transform: scaleX(1);
         transform-origin: center;
 }
 
-.nav-links li a::after {
+.nav-center-links li a::after {
         content: '';
         position: absolute;
         width: 90%;
@@ -93,6 +80,31 @@ header * {
         transform-origin: 50%;
         transition: transform 0.25s ease-out;
 }
+
+.nav-right-links li {
+        display: inline-block;
+        position: relative;
+        animation-delay: 0.35s;
+        top: -500px;
+}
+
+.nav-right-links li a {
+        height: 1.7rem;
+        display: flex;
+        align-items: center;
+        line-height: 1;
+        padding-left: 10px;
+}
+
+.nav-right-links a svg {
+        display: block;
+        position: relative;
+        width: 1.6rem;
+        height: 1.6rem;
+        fill: white;
+        top: 6px;
+}
+
 
 .switch {
         position: relative;
@@ -151,4 +163,14 @@ input:checked+.slider:before {
 
 .slider.round:before {
         border-radius: 50%;
+}
+
+.header-fall {
+        animation: drop 1s ease-out forwards;
+}
+
+@keyframes drop {
+        100% {
+                transform: translateY(500px)
+        }
 }

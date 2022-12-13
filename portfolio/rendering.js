@@ -264,18 +264,24 @@ function dropObjects() {
 }
 
 function displayNavBar() {
-        let l1 = document.getElementById('l1');
-        let l2 = document.getElementById('l2');
-        let l3 = document.getElementById('l3');
-        let logo = document.getElementById('nav-logo');
-        let dnSwitch = document.getElementById('nav-switch');
-        let section = document.getElementById('section-header');
-        l1.classList.add('header-fall');
-        l2.classList.add('header-fall');
-        l3.classList.add('header-fall');
-        logo.classList.add('header-fall');
-        dnSwitch.classList.add('header-fall');
-        section.classList.add('header-fall');
+        let navCenter = document.getElementsByClassName("nav-center-links")[0];
+        let navRight = document.getElementsByClassName("nav-right-links")[0];
+        let navCenterItems = navCenter.getElementsByTagName("li");
+        let navRightItems = navRight.getElementsByTagName("li");
+
+        let section = document.getElementById("section-header");
+        let title = section.getElementsByTagName("header")[0].getElementsByTagName("h1")[0];
+
+        let recursiveAddClass = (ul) => {
+                for (let i = 0; i < ul.length; i++) {
+                        ul[i].classList.add("header-fall");
+                }
+        }
+
+        recursiveAddClass(navCenterItems);
+        recursiveAddClass(navRightItems);
+        title.classList.add("header-fall");
+        section.classList.add("header-fall");
 }
 
 /**
