@@ -5,7 +5,7 @@ header {
         align-items: center;
         padding: 30px 9% 30px 10%;
         font-family: 'Raleway', sans-serif;
-        background-image: linear-gradient(#ffca4f, #fbe0a0);
+        background-image: linear-gradient(#ffbe26, #fbe0a0);
 }
 
 header * {
@@ -86,6 +86,10 @@ header h1 {
         position: relative;
         animation-delay: 0.35s;
         top: -500px;
+}
+
+.nav-right-links li:nth-child(2) {
+        animation-delay: 0.3s;
 }
 
 .nav-right-links li a {
