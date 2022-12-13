@@ -1,4 +1,5 @@
 @import "navbar.css";
+@import "switch.css";
 @import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
 
 * {
@@ -64,4 +65,25 @@ body,
 
 #loadOverlay {
   display: none;
+}
+
+#dn-switch {
+  position: absolute;
+  top: 95%;
+  right: 1%;
+  opacity: 0;
+}
+
+.animFadeIn {
+  animation: fadein 5s forwards;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

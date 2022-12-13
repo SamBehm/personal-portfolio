@@ -263,6 +263,11 @@ function dropObjects() {
         }
 }
 
+function fadeIn() {
+        let dnSwitch = document.getElementById("dn-switch");
+        dnSwitch.classList.add("animFadeIn");
+}
+
 function displayNavBar() {
         let navCenter = document.getElementsByClassName("nav-center-links")[0];
         let navRight = document.getElementsByClassName("nav-right-links")[0];
@@ -313,6 +318,7 @@ function initDolly() {
 
         tl.call(displayNavBar, null, 3);
         tl.call(dropObjects, null, 2.9);
+        tl.call(fadeIn, null, 2.9);
 }
 
 /**
