@@ -58,9 +58,10 @@ export function setupCanvas() {
 
         canvas = document.querySelector('#model-viewer');
 
-        camera = new THREE.PerspectiveCamera(30, 2, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({
                 canvas: canvas,
+                antialias: true
         });
 
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -94,7 +95,6 @@ function loadModels() {
                         gltfScene = gltf.scene;
                         let children = gltfScene.children;
                         for (let i = 0; i < children.length; i++) {
-                                // console.log(children[i].userData.name);
                                 models[children[i].userData.name] = children[i];
                                 switch (children[i].userData.name) {
                                         case 'Desk':
@@ -105,8 +105,6 @@ function loadModels() {
                                                 setOpacityZero(children[i]);
                                 }
                         }
-
-                        console.log(models);
                         scene.add(gltfScene);
                 }, undefined, function (error) {
                         console.error(error);

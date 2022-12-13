@@ -70,13 +70,15 @@ body,
 #dn-switch {
   position: absolute;
   top: 95%;
-  right: 1%;
+  right: 1.5%;
   opacity: 0;
 }
 
 .animFadeIn {
   animation: fadein 5s forwards;
 }
+
+
 
 @keyframes fadein {
   0% {
