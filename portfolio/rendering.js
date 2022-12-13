@@ -47,7 +47,19 @@ var slideDict = {
         "Book": "x"
 }
 
-var yOrigins = {};
+var moveableObjects = {
+        "Whiteboard": "y",
+        "Bed": "x",
+        "Bookshelf": "z"
+}
+
+var axisMovementScales = {
+        "x": 32,
+        "y": 12,
+        "z": (-9)
+}
+
+var modelOrigins = {};
 
 
 // var controls;
@@ -100,7 +112,7 @@ function loadModels() {
                         let children = gltfScene.children;
                         for (let i = 0; i < children.length; i++) {
                                 models[children[i].userData.name] = children[i];
-                                yOrigins[children[i].userData.name] = children[i].position.y;
+                                modelOrigins[children[i].userData.name] = (new THREE.Vector3).copy(children[i].position);
                                 switch (children[i].userData.name) {
                                         case 'Desk':
                                         case 'Room':
@@ -110,7 +122,7 @@ function loadModels() {
                                                 setOpacityZero(children[i]);
                                 }
                         }
-                        console.log(yOrigins);
+                        console.log(modelOrigins);
                         scene.add(gltfScene);
                 }, undefined, function (error) {
                         console.error(error);
@@ -171,6 +183,11 @@ function setupLighting() {
 
         pointLightShelf = new THREE.PointLight(0xFF9C36, 0, 40, 0.05);
         pointLightShelf.position.set(-14, 10, 14);
+        pointLightShelf.name = "shelfLight";
+        pointLightShelf.userData.name = "shelfLight";
+
+        models["shelfLight"] = pointLightShelf;
+        modelOrigins["shelfLight"] = (new THREE.Vector3).copy(pointLightShelf.position);
 
         scene.add(pointLightShelf);
 }
@@ -183,29 +200,12 @@ function setupLighting() {
  * @param {int} time Time position of the animation 
  */
 function multiAxisSlide(objTl, name, axis, time) {
-        switch (axis) {
-                case "x":
-                        objTl.from(models[name].position, {
-                                x: 30,
-                                ease: 'power2.out',
-                                duration: 1
-                        }, time);
-                        break;
-                case "y":
-                        objTl.from(models[name].position, {
-                                y: 30,
-                                ease: 'power2.out',
-                                duration: 1
-                        }, time);
-                        break;
-                case "z":
-                        objTl.from(models[name].position, {
-                                z: 50,
-                                ease: 'power2.in',
-                                duration: 1
-                        }, time);
-                        break;
-        }
+
+        objTl.from(models[name].position, {
+                [axis]: 30,
+                ease: 'power2.out',
+                duration: 1
+        }, time);
 }
 
 /**
@@ -223,7 +223,7 @@ function singleAxisSlide(objTl, name, time) {
 }
 
 function dropObjects() {
-        var objTl = gsap.timeline();
+        var objTl = gsap.timeline({ onComplete: () => { initDollyComplete = true } });
         var i = 0;
         for (const [key, value] of Object.entries(slideDict)) {
                 // multiAxisSlide(objTl, key, value, i);
@@ -317,8 +317,7 @@ export function initDolly() {
                 ease: CustomEase.create("custom", "M0,0,C0.78,0.016,0.768,0.996,0.998,0.996,0.999,0.998,1,1,1,1"),
                 x: -0.5410995928728004,
                 y: 0.698875756431121,
-                z: 0.368910029539352,
-                onComplete: () => { initDollyComplete = true }
+                z: 0.368910029539352
         }, 1);
 
         tl.call(displayNavBar, null, 3);
@@ -326,25 +325,44 @@ export function initDolly() {
         tl.call(fadeIn, null, 2.9);
 }
 
-function tweenYOnHover(INTERSECTED, direction) {
-        if (!yOrigins[INTERSECTED.userData.name]) {
-                return;
+function getGroupedObjects(object) {
+        switch (object.name) {
+                case "Bed":
+                        return [object, models["Pillow1"], models["Pillow 2"]];
+                case "Bookshelf":
+                        return [object, models["Lamp"], models["Book"], models["shelfLight"]];
+                default:
+                        return object;
         }
+}
 
-        let time, endPosition = yOrigins[INTERSECTED.userData.name];
-        if (direction < 0) {
-                time = (INTERSECTED.position - endPosition) / 2;
+function tweenOnHover(toTween, direction) {
+
+        let intersectedObjects = [];
+
+        if (!Array.isArray(toTween)) {
+                intersectedObjects.push(toTween);
         } else {
-                endPosition += 2;
-                time = (endPosition - INTERSECTED.position) / 2;
+                intersectedObjects = toTween;
         }
-        endPosition = direction < 0 ? endPosition : endPosition + 5;
 
-        gsap.to(INTERSECTED.position, {
-                y: endPosition,
-                duration: 1,
-                ease: "power1.out",
-                overwrite: true
+        let axis = moveableObjects[intersectedObjects[0].userData.name];
+
+        intersectedObjects.forEach((INTERSECTED) => {
+                let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
+                if (direction < 0) {
+                        time = Math.abs((INTERSECTED.position - endPosition) / 3);
+                } else {
+                        endPosition += axisMovementScales[axis];
+                        time = Math.abs((endPosition - INTERSECTED.position) / 3);
+                }
+
+                gsap.to(INTERSECTED.position, {
+                        [axis]: endPosition,
+                        duration: 1,
+                        ease: "power1.out",
+                        overwrite: true
+                });
         });
 
 }
@@ -359,17 +377,20 @@ function checkHover() {
 
 
         if (intersectedObjects.length > 0) {
-                console.log(intersectedObjects[0].object);
-                if (intersectedObjects[0].object != INTERSECTED && intersectedObjects[0].object.parent.name != "Room") {
+
+                if (intersectedObjects[0].object != INTERSECTED && intersectedObjects[0].object.name in moveableObjects) {
                         if (INTERSECTED) {
-                                tweenYOnHover(INTERSECTED, -1);
+                                let toTween = getGroupedObjects(INTERSECTED);
+                                tweenOnHover(toTween, -1);
                         }
                         INTERSECTED = intersectedObjects[0].object;
-                        tweenYOnHover(INTERSECTED, 1)
+                        let toTween = getGroupedObjects(INTERSECTED);
+                        tweenOnHover(toTween, 1)
                 }
         } else {
                 if (INTERSECTED) {
-                        tweenYOnHover(INTERSECTED, -1);
+                        let toTween = getGroupedObjects(INTERSECTED);
+                        tweenOnHover(toTween, -1);
                 }
                 INTERSECTED = null;
         }
