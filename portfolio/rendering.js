@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { CustomEase } from "gsap/CustomEase";
 
 
@@ -18,7 +20,6 @@ var renderer;
 
 var gltfScene;
 var models = {};
-var loader;
 
 var pointLightShelf;
 
@@ -60,6 +61,7 @@ var axisMovementScales = {
 }
 
 var modelOrigins = {};
+var textMeshes = {};
 
 
 // var controls;
@@ -91,7 +93,7 @@ export function setupCanvas() {
         window.addEventListener('resize', onWindowResize, false);
         setupLighting();
 
-        loader = new GLTFLoader();
+        const loader = new GLTFLoader();
 
         /* Debugging Controls commented out below - remember to uncomment update in animation function */
 
@@ -102,10 +104,74 @@ export function setupCanvas() {
         // });
 
         document.addEventListener("mousemove", mouseMoveEvent, false);
-        return loadModels();
+        loadText();
+        return loadModels(loader);
 }
 
-function loadModels() {
+function loadText() {
+
+        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff) });
+
+        const loader = new FontLoader();
+        loader.load('/Roboto_Black.json', function (font) {
+
+                let createTextGeometry = (text, size, axis) => {
+                        let words = text.split(" ");
+                        let group = new THREE.Group();
+                        let currentPosition = 0;
+
+                        let direction = { "x": 1, "y": -1, "z": 1 };
+
+                        words.forEach((word) => {
+                                const geometry = new TextGeometry(word, {
+                                        font: font,
+                                        size: size,
+                                        height: 0.1
+                                });
+
+                                let mesh = new THREE.Mesh(geometry, meshMaterial);
+                                if (word[0] != '\n') {
+                                        mesh.position[axis] = currentPosition;
+
+                                        let dimensions = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3());
+                                        currentPosition += direction[axis] * (dimensions[axis] + 1);
+                                }
+                                mesh.visible = false;
+                                group.add(mesh);
+                        });
+
+                        return group;
+                }
+
+
+
+                let bedTextGroup = createTextGeometry("Example Text", 2, "x");
+                bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
+                bedTextGroup.position.set(-15, -6, 24);
+
+                let whiteboardTextGroup = createTextGeometry("Example \nText", 1.3, "y");
+                whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
+                whiteboardTextGroup.position.set(-15.4, 4.8, 26.5);
+
+                let bookShelfTextGroup = createTextGeometry("Example \nText", 1.3, "y");
+                bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
+                bookShelfTextGroup.position.set(-15.4, 4.8, 16);
+
+                textMeshes["Bed"] = bedTextGroup;
+                textMeshes["Whiteboard"] = whiteboardTextGroup;
+                textMeshes["Bookshelf"] = bookShelfTextGroup;
+
+                scene.add(bedTextGroup);
+                scene.add(whiteboardTextGroup);
+                scene.add(bookShelfTextGroup);
+
+        }, undefined, function (error) {
+                console.error(error);
+                resolve(false);
+        });
+}
+
+function loadModels(loader) {
         return new Promise((resolve, reject) => {
                 loader.load('/room.glb', function (gltf) {
                         gltfScene = gltf.scene;
@@ -347,7 +413,7 @@ function tweenOnHover(toTween, direction) {
         }
 
         let axis = moveableObjects[intersectedObjects[0].userData.name];
-
+        let tl = new gsap.timeline();
         intersectedObjects.forEach((INTERSECTED) => {
                 let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
                 if (direction < 0) {
@@ -357,12 +423,35 @@ function tweenOnHover(toTween, direction) {
                         time = Math.abs((endPosition - INTERSECTED.position) / 3);
                 }
 
-                gsap.to(INTERSECTED.position, {
+                tl.to(INTERSECTED.position, {
                         [axis]: endPosition,
                         duration: 1,
                         ease: "power1.out",
                         overwrite: true
-                });
+                }, 0);
+        });
+
+        let textTimeIncrement = 0;
+        let time = 0;
+        if (intersectedObjects[0].userData.name == "Bed") {
+                textTimeIncrement = 0.1;
+        }
+
+        let words = textMeshes[intersectedObjects[0].userData.name].children;
+
+
+
+        if (direction < 0) {
+                words = words.slice().reverse();
+                time = 0.6;
+                textTimeIncrement *= -1;
+        }
+
+        words.forEach((word) => {
+                tl.call(() => {
+                        word.visible = direction > 0;
+                }, null, time);
+                time += textTimeIncrement;
         });
 
 }
@@ -374,8 +463,6 @@ function checkHover() {
 
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
-
-
         if (intersectedObjects.length > 0) {
 
                 if (intersectedObjects[0].object != INTERSECTED && intersectedObjects[0].object.name in moveableObjects) {
@@ -385,7 +472,7 @@ function checkHover() {
                         }
                         INTERSECTED = intersectedObjects[0].object;
                         let toTween = getGroupedObjects(INTERSECTED);
-                        tweenOnHover(toTween, 1)
+                        tweenOnHover(toTween, 1);
                 }
         } else {
                 if (INTERSECTED) {
