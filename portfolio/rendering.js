@@ -110,12 +110,13 @@ export function setupCanvas() {
 
 function loadText() {
 
-        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff) });
-
         const loader = new FontLoader();
         loader.load('/Roboto_Black.json', function (font) {
 
                 let createTextGeometry = (name, text, size, axis) => {
+
+                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff) });
+
                         let words = text.split(" ");
                         let group = new THREE.Group();
                         let currentPosition = 0;
@@ -497,12 +498,8 @@ function checkHover() {
                         }
                 }
                 if (intersectedObject.name != INTERSECTED_TEXT) {
-
                         if (INTERSECTED_TEXT) {
-                                let words = textMeshes[INTERSECTED_TEXT].children;
-                                words.forEach((word) => {
-                                        word.material.color.setHex(0xFFFFFF);
-                                });
+                                textMeshes[INTERSECTED_TEXT].children[0].material.color.setHex(0xFFFFFF);
                                 INTERSECTED_TEXT = null;
                         }
 
