@@ -413,7 +413,50 @@ function tweenOnHover(toTween, direction) {
         }
 
         let axis = moveableObjects[intersectedObjects[0].userData.name];
-        let tl = new gsap.timeline();
+        let tl;
+
+        if (intersectedObjects[0].userData.name == "Bed") {
+                tl = gsap.timeline({
+                        onUpdate: () => {
+                                let updatePosition = modelOrigins["Bed"].x + 4;
+                                let currentPosition = intersectedObjects[0].position.x;
+                                if (currentPosition < updatePosition && currentPosition > updatePosition - 2) {
+                                        let words = textMeshes["BedText"].children;
+                                        words.forEach((word, index) => {
+                                                if (index != 0) {
+                                                        word.visible = direction > 0;
+                                                }
+                                        });
+                                }
+                        },
+                        onStart: () => {
+                                textMeshes["BedText"].children[0].visible = true;
+                        },
+                        onComplete: () => {
+                                if (direction < 0) {
+                                        textMeshes["BedText"].children[0].visible = false;
+                                }
+                        }
+                });
+        } else {
+                tl = gsap.timeline({
+                        onStart: () => {
+                                let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
+                                words.forEach((word) => {
+                                        word.visible = true;
+                                })
+                        },
+                        onComplete: () => {
+                                let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
+                                words.forEach((word) => {
+                                        word.visible = direction > 0;
+                                })
+                        }
+                });
+        }
+
+
+
         intersectedObjects.forEach((INTERSECTED) => {
                 let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
                 if (direction < 0) {
@@ -429,27 +472,6 @@ function tweenOnHover(toTween, direction) {
                         ease: "power1.out",
                         overwrite: true
                 }, 0);
-        });
-
-        let textTimeIncrement = 0;
-        let time = 0;
-        if (intersectedObjects[0].userData.name == "Bed") {
-                textTimeIncrement = 0.1;
-        }
-
-        let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
-
-        if (direction < 0) {
-                words = words.slice().reverse();
-                time = 0.6;
-                textTimeIncrement *= -1;
-        }
-
-        words.forEach((word) => {
-                tl.call(() => {
-                        word.visible = direction > 0;
-                }, null, time);
-                time += textTimeIncrement;
         });
 
 }
