@@ -26,7 +26,7 @@ var pointLightShelf;
 var initDollyComplete = false;
 
 var mouse = { x: 0, y: 0 };
-var INTERSECTED;
+var INTERSECTED, INTERSECTED_TEXT;
 
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
@@ -115,7 +115,7 @@ function loadText() {
         const loader = new FontLoader();
         loader.load('/Roboto_Black.json', function (font) {
 
-                let createTextGeometry = (text, size, axis) => {
+                let createTextGeometry = (name, text, size, axis) => {
                         let words = text.split(" ");
                         let group = new THREE.Group();
                         let currentPosition = 0;
@@ -137,6 +137,7 @@ function loadText() {
                                         currentPosition += direction[axis] * (dimensions[axis] + 1);
                                 }
                                 mesh.visible = false;
+                                mesh.name = name;
                                 group.add(mesh);
                         });
 
@@ -145,21 +146,21 @@ function loadText() {
 
 
 
-                let bedTextGroup = createTextGeometry("Example Text", 2, "x");
+                let bedTextGroup = createTextGeometry("BedText", "Example Text", 2, "x");
                 bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
                 bedTextGroup.position.set(-15, -6, 24);
 
-                let whiteboardTextGroup = createTextGeometry("Example \nText", 1.3, "y");
+                let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
                 whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
                 whiteboardTextGroup.position.set(-15.4, 4.8, 26.5);
 
-                let bookShelfTextGroup = createTextGeometry("Example \nText", 1.3, "y");
+                let bookShelfTextGroup = createTextGeometry("BookshelfText", "Example \nText", 1.3, "y");
                 bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
                 bookShelfTextGroup.position.set(-15.4, 4.8, 16);
 
-                textMeshes["Bed"] = bedTextGroup;
-                textMeshes["Whiteboard"] = whiteboardTextGroup;
-                textMeshes["Bookshelf"] = bookShelfTextGroup;
+                textMeshes["BedText"] = bedTextGroup;
+                textMeshes["WhiteboardText"] = whiteboardTextGroup;
+                textMeshes["BookshelfText"] = bookShelfTextGroup;
 
                 scene.add(bedTextGroup);
                 scene.add(whiteboardTextGroup);
@@ -188,7 +189,6 @@ function loadModels(loader) {
                                                 setOpacityZero(children[i]);
                                 }
                         }
-                        console.log(modelOrigins);
                         scene.add(gltfScene);
                 }, undefined, function (error) {
                         console.error(error);
@@ -437,9 +437,7 @@ function tweenOnHover(toTween, direction) {
                 textTimeIncrement = 0.1;
         }
 
-        let words = textMeshes[intersectedObjects[0].userData.name].children;
-
-
+        let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
 
         if (direction < 0) {
                 words = words.slice().reverse();
@@ -464,15 +462,38 @@ function checkHover() {
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
         if (intersectedObjects.length > 0) {
-
-                if (intersectedObjects[0].object != INTERSECTED && intersectedObjects[0].object.name in moveableObjects) {
-                        if (INTERSECTED) {
+                let intersectedObject = intersectedObjects[0].object;
+                if (intersectedObject != INTERSECTED) {
+                        if (intersectedObject.name in moveableObjects) {
+                                if (INTERSECTED) {
+                                        let toTween = getGroupedObjects(INTERSECTED);
+                                        tweenOnHover(toTween, -1);
+                                }
+                                INTERSECTED = intersectedObject;
                                 let toTween = getGroupedObjects(INTERSECTED);
-                                tweenOnHover(toTween, -1);
+                                tweenOnHover(toTween, 1);
                         }
-                        INTERSECTED = intersectedObjects[0].object;
-                        let toTween = getGroupedObjects(INTERSECTED);
-                        tweenOnHover(toTween, 1);
+                }
+                if (intersectedObject.name != INTERSECTED_TEXT) {
+
+                        if (INTERSECTED_TEXT) {
+                                let words = textMeshes[INTERSECTED_TEXT].children;
+                                words.forEach((word) => {
+                                        word.material.color.setHex(0xFFFFFF);
+                                });
+                                INTERSECTED_TEXT = null;
+                        }
+
+                        if (Object.keys(textMeshes).indexOf(intersectedObject.name) >= 0) {
+
+                                let words = textMeshes[intersectedObject.name].children;
+                                words.forEach((word) => {
+                                        word.material.color.setHex(0x3A7D44);
+                                });
+
+                                INTERSECTED_TEXT = intersectedObject.name;
+                        }
+
                 }
         } else {
                 if (INTERSECTED) {
