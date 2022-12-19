@@ -20,13 +20,14 @@ var renderer;
 
 var gltfScene;
 var models = {};
+var bboxes = {};
 
 var pointLightShelf;
 
 var initDollyComplete = false;
 
 var mouse = { x: 0, y: 0 };
-var INTERSECTED, INTERSECTED_TEXT;
+var INTERSECTED;
 
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
@@ -50,14 +51,8 @@ var slideDict = {
 
 var moveableObjects = {
         "Whiteboard": "y",
-        "Bed": "x",
-        "Bookshelf": "z"
-}
-
-var axisMovementScales = {
-        "x": 32,
-        "y": 12,
-        "z": (-9)
+        "Bed": "y",
+        "Bookshelf": "y"
 }
 
 var modelOrigins = {};
@@ -137,7 +132,6 @@ function loadText() {
                                         let dimensions = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3());
                                         currentPosition += direction[axis] * (dimensions[axis] + 1);
                                 }
-                                mesh.visible = false;
                                 mesh.name = name;
                                 group.add(mesh);
                         });
@@ -147,9 +141,9 @@ function loadText() {
 
 
 
-                let bedTextGroup = createTextGeometry("BedText", "Example Text", 2, "x");
-                bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
-                bedTextGroup.position.set(-15, -6, 24);
+                let bedTextGroup = createTextGeometry("BedText", "Example \nText", 1, "x");
+                bedTextGroup.rotation.set(0, Math.PI / 2, 0);
+                bedTextGroup.position.set(1.5, -2.5, 26);
 
                 let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
                 whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
@@ -189,6 +183,11 @@ function loadModels(loader) {
                                         default:
                                                 setOpacityZero(children[i]);
                                 }
+
+                                if (children[i].userData.name in moveableObjects) {
+                                        createBoundingBox(children[i]);
+                                }
+
                         }
                         scene.add(gltfScene);
                 }, undefined, function (error) {
@@ -198,6 +197,24 @@ function loadModels(loader) {
 
                 resolve(true);
         });
+}
+
+function createBoundingBox(object) {
+        const bbox = new THREE.Box3();
+        bbox.setFromObject(object);
+
+        const dimensions = new THREE.Vector3().subVectors(bbox.max, bbox.min);
+        const geometry = new THREE.BoxGeometry(dimensions.x + 0.5, dimensions.y + 0.5, dimensions.z + 0.5);
+        const matrix = new THREE.Matrix4().setPosition(dimensions.addVectors(bbox.min, bbox.max).multiplyScalar(0.5));
+
+        geometry.applyMatrix4(matrix);
+
+        const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+        mesh.name = object.name;
+        mesh.material.visible = false;
+        bboxes[object.userData.name] = mesh;
+
+        scene.add(mesh);
 }
 
 /**
@@ -414,62 +431,17 @@ function tweenOnHover(toTween, direction) {
         }
 
         let axis = moveableObjects[intersectedObjects[0].userData.name];
-        let tl;
-
-        if (intersectedObjects[0].userData.name == "Bed") {
-                tl = gsap.timeline({
-                        onUpdate: () => {
-                                let updatePosition = modelOrigins["Bed"].x + 4;
-                                let currentPosition = intersectedObjects[0].position.x;
-                                if (currentPosition < updatePosition && currentPosition > updatePosition - 2) {
-                                        let words = textMeshes["BedText"].children;
-                                        words.forEach((word, index) => {
-                                                if (index != 0) {
-                                                        word.visible = direction > 0;
-                                                }
-                                        });
-                                }
-                        },
-                        onStart: () => {
-                                textMeshes["BedText"].children[0].visible = true;
-                        },
-                        onComplete: () => {
-                                if (direction < 0) {
-                                        textMeshes["BedText"].children[0].visible = false;
-                                }
-                        }
-                });
-        } else {
-                tl = gsap.timeline({
-                        onStart: () => {
-                                let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
-                                words.forEach((word) => {
-                                        word.visible = true;
-                                })
-                        },
-                        onComplete: () => {
-                                let words = textMeshes[intersectedObjects[0].userData.name + "Text"].children;
-                                words.forEach((word) => {
-                                        word.visible = direction > 0;
-                                })
-                        }
-                });
-        }
-
-
+        let tl = gsap.timeline();
 
         intersectedObjects.forEach((INTERSECTED) => {
                 let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
-                if (direction < 0) {
-                        time = Math.abs((INTERSECTED.position - endPosition) / 3);
-                } else {
-                        endPosition += axisMovementScales[axis];
-                        time = Math.abs((endPosition - INTERSECTED.position) / 3);
+                if (direction > 0) {
+                        endPosition += 3;
                 }
 
                 tl.to(INTERSECTED.position, {
                         [axis]: endPosition,
-                        duration: 1,
+                        duration: 0.5,
                         ease: "power1.out",
                         overwrite: true
                 }, 0);
@@ -478,49 +450,40 @@ function tweenOnHover(toTween, direction) {
 }
 
 function checkHover() {
-        var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
         var raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(mouse, camera);
 
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
-        if (intersectedObjects.length > 0) {
-                let intersectedObject = intersectedObjects[0].object;
-                if (intersectedObject != INTERSECTED) {
-                        if (intersectedObject.name in moveableObjects) {
-                                if (INTERSECTED) {
-                                        let toTween = getGroupedObjects(INTERSECTED);
-                                        tweenOnHover(toTween, -1);
-                                }
-                                INTERSECTED = intersectedObject;
-                                let toTween = getGroupedObjects(INTERSECTED);
-                                tweenOnHover(toTween, 1);
-                        }
-                }
-                if (intersectedObject.name != INTERSECTED_TEXT) {
-                        if (INTERSECTED_TEXT) {
-                                textMeshes[INTERSECTED_TEXT].children[0].material.color.setHex(0xFFFFFF);
-                                INTERSECTED_TEXT = null;
-                        }
-
-                        if (Object.keys(textMeshes).indexOf(intersectedObject.name) >= 0) {
-
-                                let words = textMeshes[intersectedObject.name].children;
-                                words.forEach((word) => {
-                                        word.material.color.setHex(0x3A7D44);
-                                });
-
-                                INTERSECTED_TEXT = intersectedObject.name;
-                        }
-
-                }
-        } else {
+        if (intersectedObjects.length == 0) {
                 if (INTERSECTED) {
                         let toTween = getGroupedObjects(INTERSECTED);
                         tweenOnHover(toTween, -1);
                 }
                 INTERSECTED = null;
+                return;
         }
+
+        let intersectedObject = intersectedObjects[0].object;
+
+        if (INTERSECTED) {
+                if (intersectedObject == bboxes[INTERSECTED.name]) {
+                        return;
+                }
+                let toTween = getGroupedObjects(INTERSECTED);
+                tweenOnHover(toTween, -1);
+                INTERSECTED = null;
+        }
+
+
+        if (!(intersectedObject.name in bboxes)) {
+                return;
+        }
+
+
+        INTERSECTED = models[intersectedObject.name];
+        let toTween = getGroupedObjects(INTERSECTED);
+        tweenOnHover(toTween, 1);
 }
 
 
