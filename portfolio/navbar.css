@@ -5,7 +5,7 @@ header {
         align-items: center;
         padding: 30px 9% 30px 10%;
         font-family: 'Raleway', sans-serif;
-        background-image: linear-gradient(#ffbe26, #fbe0a0);
+        background-image: linear-gradient(var(--day-shadow), var(--day-midtone));
 }
 
 header * {
@@ -13,7 +13,7 @@ header * {
         font-family: inherit;
         font-weight: 400;
         font-size: 24px;
-        color: white;
+        color: var(--day-highlight);
         text-decoration: none;
 }
 
@@ -76,7 +76,7 @@ header h1 {
         height: 2px;
         bottom: 0;
         left: 0;
-        background-color: white;
+        background-color: var(--day-highlight);
         transform-origin: 50%;
         transition: transform 0.25s ease-out;
 }
@@ -105,7 +105,7 @@ header h1 {
         position: relative;
         width: 1.6rem;
         height: 1.6rem;
-        fill: white;
+        fill: var(--day-highlight);
         top: 6px;
 }
 

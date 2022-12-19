@@ -14,6 +14,7 @@ gsap.registerPlugin(CustomEase);
 
 var scene;
 var canvas;
+var style;
 
 var camera;
 var renderer;
@@ -58,6 +59,9 @@ var moveableObjects = {
 var modelOrigins = {};
 var textMeshes = {};
 
+var day_pallete = {};
+var night_pallete = {};
+var currentPallete;
 
 // var controls;
 
@@ -66,9 +70,17 @@ var textMeshes = {};
 
 
 export function setupCanvas() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xfbe0a0);
 
+        style = getComputedStyle(document.body);
+        day_pallete["highlight"] = parseInt(style.getPropertyValue('--day-highlight').substring(2), 16);
+        day_pallete["midtone"] = parseInt(style.getPropertyValue('--day-midtone').substring(2), 16);
+        day_pallete["shadow"] = parseInt(style.getPropertyValue('--day-shadow').substring(2), 16);
+
+        currentPallete = day_pallete;
+        console.log(currentPallete);
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(day_pallete["midtone"]);
         canvas = document.querySelector('#model-viewer');
 
         camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -110,7 +122,7 @@ function loadText() {
 
                 let createTextGeometry = (name, text, size, axis) => {
 
-                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff), transparent: true, opacity: 0 });
+                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(currentPallete["highlight"]), transparent: true, opacity: 0 });
 
                         let words = text.split(" ");
                         let group = new THREE.Group();
@@ -449,8 +461,6 @@ function tweenOnHover(toTween, direction) {
 
         let textMaterial = textMeshes[intersectedObjects[0].name + "Text"].children[0].material;
         let targetOpacity = direction > 0 ? 1 : 0;
-        console.log(textMaterial);
-        console.log(targetOpacity);
 
         tl.to(textMaterial, {
                 opacity: targetOpacity,

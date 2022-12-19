@@ -17,6 +17,15 @@ body,
   background-color: black;
 }
 
+:root {
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+
+  --day-highlight: #ffffff;
+  --day-midtone: #fbe0a0;
+  --day-shadow: #ffbe26;
+}
+
 .fullscreen-black {
   display: flex;
   flex-wrap: nowrap;
