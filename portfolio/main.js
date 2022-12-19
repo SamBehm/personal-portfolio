@@ -1,5 +1,5 @@
 import './style.css'
-import { setupCanvas, animate, initDolly, getIntersected } from './rendering'
+import { setupCanvas, animate, initDolly, getIntersected, onInfoExpand } from './rendering'
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -56,7 +56,7 @@ async function printPreamble() {
 function onClickEvent(event) {
   let intersectedObject = getIntersected();
   if (intersectedObject) {
-    console.log(intersectedObject.name);
+    onInfoExpand(intersectedObject);
   }
 }
 

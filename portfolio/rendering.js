@@ -508,6 +508,29 @@ function checkHover() {
         tweenOnHover(toTween, 1);
 }
 
+export function onInfoExpand(object) {
+        let bgColor;
+        switch (object.name) {
+                case "Bookshelf":
+                        bgColor = new THREE.Color(0x3c1109);
+                        break;
+                case "Bed":
+                        bgColor = new THREE.Color(0x0e0e0e);
+                        break;
+                case "Whiteboard":
+                        bgColor = new THREE.Color(0xffffff);
+                        break;
+                default:
+                        throw new Error("Invalid object selected... somehow?");
+        }
+
+        gsap.to(scene.background, {
+                r: bgColor.r,
+                g: bgColor.g,
+                b: bgColor.b,
+                duration: 1
+        });
+}
 
 /**
  * Animation Loop
