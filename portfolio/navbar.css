@@ -110,7 +110,7 @@ header h1 {
 }
 
 .header-fall {
-        animation: drop 1s ease-out forwards;
+        animation: drop 2s ease-out forwards;
 }
 
 @keyframes drop {
