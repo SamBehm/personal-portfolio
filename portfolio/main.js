@@ -1,5 +1,5 @@
 import './style.css'
-import { setupCanvas, animate, initDolly } from './rendering'
+import { setupCanvas, animate, initDolly, getIntersected } from './rendering'
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -15,6 +15,9 @@ const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio
 async function main() {
   await initLoadingScreen();
   initDolly();
+
+  document.addEventListener('click', onClickEvent);
+
   animate();
 }
 
@@ -47,6 +50,13 @@ async function printPreamble() {
   for (let lineNum = 1; lineNum < console_text.length; lineNum++) {
     screenConsole.innerHTML += console_text[lineNum] + '<br/>';
     await new Promise(r => setTimeout(r, Math.floor(Math.random() * 501)));
+  }
+}
+
+function onClickEvent(event) {
+  let intersectedObject = getIntersected();
+  if (intersectedObject) {
+    console.log(intersectedObject.name);
   }
 }
 

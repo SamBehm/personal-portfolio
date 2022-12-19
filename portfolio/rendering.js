@@ -110,7 +110,7 @@ function loadText() {
 
                 let createTextGeometry = (name, text, size, axis) => {
 
-                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff) });
+                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff), transparent: true, opacity: 0 });
 
                         let words = text.split(" ");
                         let group = new THREE.Group();
@@ -141,17 +141,17 @@ function loadText() {
 
 
 
-                let bedTextGroup = createTextGeometry("BedText", "Example \nText", 1, "x");
-                bedTextGroup.rotation.set(0, Math.PI / 2, 0);
-                bedTextGroup.position.set(1.5, -2.5, 26);
+                let bedTextGroup = createTextGeometry("BedText", "Example \nText", 2, "x");
+                bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
+                bedTextGroup.position.set(3, -4, 24);
 
                 let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
                 whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
-                whiteboardTextGroup.position.set(-15.4, 4.8, 26.5);
+                whiteboardTextGroup.position.set(-15.4, 3, 26.5);
 
                 let bookShelfTextGroup = createTextGeometry("BookshelfText", "Example \nText", 1.3, "y");
                 bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
-                bookShelfTextGroup.position.set(-15.4, 4.8, 16);
+                bookShelfTextGroup.position.set(-15.4, 11, 26.5);
 
                 textMeshes["BedText"] = bedTextGroup;
                 textMeshes["WhiteboardText"] = whiteboardTextGroup;
@@ -447,6 +447,18 @@ function tweenOnHover(toTween, direction) {
                 }, 0);
         });
 
+        let textMaterial = textMeshes[intersectedObjects[0].name + "Text"].children[0].material;
+        let targetOpacity = direction > 0 ? 1 : 0;
+        console.log(textMaterial);
+        console.log(targetOpacity);
+
+        tl.to(textMaterial, {
+                opacity: targetOpacity,
+                duration: 0.5,
+                ease: "power1.out",
+                overwrite: true
+        }, 0);
+
 }
 
 function checkHover() {
@@ -515,4 +527,8 @@ function mouseMoveEvent(event) {
         event.preventDefault();
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+}
+
+export function getIntersected() {
+        return INTERSECTED;
 }
