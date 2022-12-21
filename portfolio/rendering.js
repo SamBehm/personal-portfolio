@@ -19,7 +19,7 @@ var style;
 var camera;
 var renderer;
 
-var gltfScene;
+var pivotGroup;
 var models = {};
 var bboxes = {};
 
@@ -69,7 +69,7 @@ var currentPallete;
 
 
 
-export function setupCanvas() {
+export async function setupCanvas() {
 
         style = getComputedStyle(document.body);
         day_pallete["highlight"] = parseInt(style.getPropertyValue('--day-highlight').substring(2), 16);
@@ -77,7 +77,6 @@ export function setupCanvas() {
         day_pallete["shadow"] = parseInt(style.getPropertyValue('--day-shadow').substring(2), 16);
 
         currentPallete = day_pallete;
-        console.log(currentPallete);
 
         scene = new THREE.Scene();
         scene.background = new THREE.Color(day_pallete["midtone"]);
@@ -97,10 +96,11 @@ export function setupCanvas() {
         camera.rotation.set(-0.06, 0, 0);
         camera.updateProjectionMatrix();
 
-        window.addEventListener('resize', onWindowResize, false);
-        setupLighting();
+        pivotGroup = new THREE.Object3D();
 
-        const loader = new GLTFLoader();
+        window.addEventListener('resize', onWindowResize, false);
+
+
 
         /* Debugging Controls commented out below - remember to uncomment update in animation function */
 
@@ -111,79 +111,37 @@ export function setupCanvas() {
         // });
 
         document.addEventListener("mousemove", mouseMoveEvent, false);
-        loadText();
-        return loadModels(loader);
+
+        let objects = [];
+        return loadModels(objects).then((result) => loadText(result));
 }
 
-function loadText() {
+export function setupScene(objects) {
 
-        const loader = new FontLoader();
-        loader.load('/Roboto_Black.json', function (font) {
+        scene.add(pivotGroup);
 
-                let createTextGeometry = (name, text, size, axis) => {
+        // center pivot point
+        const bbox = new THREE.Box3();
+        bbox.setFromObject(models["Room"]);
 
-                        const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(currentPallete["highlight"]), transparent: true, opacity: 0 });
+        const position = new THREE.Vector3();
+        bbox.getCenter(position);
 
-                        let words = text.split(" ");
-                        let group = new THREE.Group();
-                        let currentPosition = 0;
+        pivotGroup.position.copy(position);
 
-                        let direction = { "x": 1, "y": -1, "z": 1 };
-
-                        words.forEach((word) => {
-                                const geometry = new TextGeometry(word, {
-                                        font: font,
-                                        size: size,
-                                        height: 0.1
-                                });
-
-                                let mesh = new THREE.Mesh(geometry, meshMaterial);
-                                if (word[0] != '\n') {
-                                        mesh.position[axis] = currentPosition;
-
-                                        let dimensions = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3());
-                                        currentPosition += direction[axis] * (dimensions[axis] + 1);
-                                }
-                                mesh.name = name;
-                                group.add(mesh);
-                        });
-
-                        return group;
-                }
-
-
-
-                let bedTextGroup = createTextGeometry("BedText", "Example \nText", 2, "x");
-                bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
-                bedTextGroup.position.set(3, -4, 24);
-
-                let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
-                whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
-                whiteboardTextGroup.position.set(-15.4, 3, 26.5);
-
-                let bookShelfTextGroup = createTextGeometry("BookshelfText", "Example \nText", 1.3, "y");
-                bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
-                bookShelfTextGroup.position.set(-15.4, 11, 26.5);
-
-                textMeshes["BedText"] = bedTextGroup;
-                textMeshes["WhiteboardText"] = whiteboardTextGroup;
-                textMeshes["BookshelfText"] = bookShelfTextGroup;
-
-                scene.add(bedTextGroup);
-                scene.add(whiteboardTextGroup);
-                scene.add(bookShelfTextGroup);
-
-        }, undefined, function (error) {
-                console.error(error);
-                resolve(false);
+        objects.forEach((object) => {
+                pivotGroup.attach(object);
         });
+
+        setupLighting();
 }
 
-function loadModels(loader) {
+function loadModels(objects) {
+        const loader = new GLTFLoader();
+
         return new Promise((resolve, reject) => {
                 loader.load('/room.glb', function (gltf) {
-                        gltfScene = gltf.scene;
-                        let children = gltfScene.children;
+                        let children = gltf.scene.children;
                         for (let i = 0; i < children.length; i++) {
                                 models[children[i].userData.name] = children[i];
                                 modelOrigins[children[i].userData.name] = (new THREE.Vector3).copy(children[i].position);
@@ -197,19 +155,86 @@ function loadModels(loader) {
                                 }
 
                                 if (children[i].userData.name in moveableObjects) {
-                                        createBoundingBox(children[i]);
+                                        objects.push(createBoundingBox(children[i]));
                                 }
 
                         }
-                        scene.add(gltfScene);
+                        objects.push(gltf.scene);
+
+                        resolve(objects)
                 }, undefined, function (error) {
                         console.error(error);
-                        resolve(false);
+                        reject();
                 });
-
-                resolve(true);
         });
 }
+
+function loadText(objects) {
+        const loader = new FontLoader();
+        return new Promise((resolve, reject) => {
+                loader.load('Roboto_Black.json', function (font) {
+                        let createTextGeometry = (name, text, size, axis) => {
+
+                                const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(currentPallete["highlight"]), transparent: true, opacity: 0 });
+
+                                let words = text.split(" ");
+                                let group = new THREE.Group();
+                                let currentPosition = 0;
+
+                                let direction = { "x": 1, "y": -1, "z": 1 };
+
+                                words.forEach((word) => {
+                                        const geometry = new TextGeometry(word, {
+                                                font: font,
+                                                size: size,
+                                                height: 0.1
+                                        });
+
+                                        let mesh = new THREE.Mesh(geometry, meshMaterial);
+                                        if (word[0] != '\n') {
+                                                mesh.position[axis] = currentPosition;
+
+                                                let dimensions = new THREE.Box3().setFromObject(mesh).getSize(new THREE.Vector3());
+                                                currentPosition += direction[axis] * (dimensions[axis] + 1);
+                                        }
+                                        mesh.name = name;
+                                        group.add(mesh);
+                                });
+
+                                return group;
+                        };
+
+                        let bedTextGroup = createTextGeometry("BedText", "Example \nText", 2, "x");
+                        bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
+                        bedTextGroup.position.set(3, -4, 24);
+
+                        let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
+                        whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
+                        whiteboardTextGroup.position.set(-15.4, 3, 26.5);
+
+                        let bookShelfTextGroup = createTextGeometry("BookshelfText", "Example \nText", 1.3, "y");
+                        bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
+                        bookShelfTextGroup.position.set(-15.4, 11, 26.5);
+
+                        textMeshes["BedText"] = bedTextGroup;
+                        textMeshes["WhiteboardText"] = whiteboardTextGroup;
+                        textMeshes["BookshelfText"] = bookShelfTextGroup;
+
+                        objects.push(bedTextGroup);
+                        objects.push(whiteboardTextGroup);
+                        objects.push(bookShelfTextGroup);
+
+                        resolve(objects);
+
+                }, undefined, function (error) {
+                        console.error("LoadText Error: " + error);
+                        reject();
+                });
+        });
+
+}
+
+
 
 function createBoundingBox(object) {
         const bbox = new THREE.Box3();
@@ -226,7 +251,7 @@ function createBoundingBox(object) {
         mesh.material.visible = false;
         bboxes[object.userData.name] = mesh;
 
-        scene.add(mesh);
+        return mesh;
 }
 
 /**
@@ -275,7 +300,7 @@ function setupLighting() {
         spotLight.shadow.camera.far = 4000;
         spotLight.shadow.camera.fov = 30;
 
-        scene.add(spotLight);
+        pivotGroup.attach(spotLight);
 
         pointLightShelf = new THREE.PointLight(0xFF9C36, 0, 40, 0.05);
         pointLightShelf.position.set(-14, 10, 14);
@@ -283,9 +308,10 @@ function setupLighting() {
         pointLightShelf.userData.name = "shelfLight";
 
         models["shelfLight"] = pointLightShelf;
-        modelOrigins["shelfLight"] = (new THREE.Vector3).copy(pointLightShelf.position);
 
-        scene.add(pointLightShelf);
+        pivotGroup.attach(pointLightShelf);
+
+        modelOrigins["shelfLight"] = (new THREE.Vector3).copy(pointLightShelf.position);
 }
 
 /**
@@ -444,6 +470,8 @@ function tweenOnHover(toTween, direction) {
 
         let axis = moveableObjects[intersectedObjects[0].userData.name];
         let tl = gsap.timeline();
+        console.log(intersectedObjects);
+        console.log("//////////////////////");
 
         intersectedObjects.forEach((INTERSECTED) => {
                 let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
@@ -524,12 +552,21 @@ export function onInfoExpand(object) {
                         throw new Error("Invalid object selected... somehow?");
         }
 
-        gsap.to(scene.background, {
+        let tl = gsap.timeline();
+
+        tl.to(scene.background, {
                 r: bgColor.r,
                 g: bgColor.g,
                 b: bgColor.b,
                 duration: 1
-        });
+        }, 0);
+
+        tl.to(pivotGroup.rotation, {
+                y: pivotGroup.rotation.y + (2 * Math.PI),
+                duration: 1,
+                ease: "power1.out",
+                overwrite: false
+        }, 0);
 }
 
 /**

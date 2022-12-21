@@ -1,5 +1,5 @@
 import './style.css'
-import { setupCanvas, animate, initDolly, getIntersected, onInfoExpand } from './rendering'
+import { setupCanvas, animate, initDolly, getIntersected, onInfoExpand, setupScene } from './rendering'
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -25,14 +25,17 @@ async function main() {
  * Function used to display loading screen on `console`, while models are being loaded.
  */
 async function initLoadingScreen() {
-  let canvasSetupComplete = setupCanvas();
-  // await printPreamble();
-  await canvasSetupComplete;
-  if (!canvasSetupComplete) {
-    document.querySelector("#screen-console-text").innerHTML += '<span style="color:red">Error! Failed to load Models</span>';
+  try {
+    let p = setupCanvas();
+    await printPreamble();
+    let objects = await p;
+
+    setupScene(objects);
+    document.querySelector("#div-screen-console").style.display = 'none';
+  } catch (error) {
+    document.querySelector("#screen-console-text").innerHTML += '<span style="color:red">Error! ' + error + '<br />Let me know the error and I\'ll try and fix it :(</span>';
     return;
   }
-  document.querySelector("#div-screen-console").style.display = 'none';
 }
 
 async function printPreamble() {
