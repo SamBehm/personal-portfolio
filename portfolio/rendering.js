@@ -392,7 +392,9 @@ function dropObjects() {
 
 function fadeIn() {
         let dnSwitch = document.getElementById("dn-switch");
+        let welcomeDiv = document.getElementById("content-welcome");
         dnSwitch.classList.add("animFadeIn");
+        welcomeDiv.classList.add("animFadeIn");
 }
 
 function displayNavBar() {
@@ -558,7 +560,11 @@ export function onInfoExpand(object) {
                         throw new Error("Invalid object selected... somehow?");
         }
 
-        let tl = gsap.timeline();
+        let tl = gsap.timeline({
+                onComplete: () => {
+                        inRotation = false;
+                }
+        });
 
         tl.to(scene.background, {
                 r: bgColor.r,
@@ -570,14 +576,16 @@ export function onInfoExpand(object) {
         console.log(pivotGroup.rotation.y);
 
         tl.to(pivotGroup.rotation, {
+                x: 0.08,
                 y: (2 * Math.PI),
-                duration: 1,
-                ease: "power1.out",
-                overwrite: false,
-                onComplete: () => {
-                        pivotGroup.rotation.y = 0;
-                        inRotation = false;
-                }
+                duration: 1
+        }, 0);
+
+        tl.to(pivotGroup.position, {
+                x: pivotGroup.position.x - 20,
+                z: pivotGroup.position.z - 80,
+                y: pivotGroup.position.y - 35,
+                duration: 1
         }, 0);
 }
 

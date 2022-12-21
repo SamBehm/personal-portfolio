@@ -50,7 +50,7 @@ body,
 
 #screen-console-text {
   margin-left: 3%;
-  color: white;
+  color: var(--day-highlight);
   font-family: monospace;
   font-size: 150%;
 }
@@ -87,7 +87,30 @@ body,
   animation: fadein 5s forwards;
 }
 
+#div-content-container {
+  position: relative;
+  left: 5%;
+  top: 35%;
+  width: 95%;
+}
 
+.content-div,
+.content-div * {}
+
+#content-welcome {
+  color: var(--day-highlight);
+  font-family: 'Raleway', sans-serif;
+  font-size: 180%;
+  width: 22%;
+  opacity: 0%;
+  border-radius: 15px;
+  padding: 10px;
+  transition: background-color 0.5s;
+}
+
+#content-welcome:hover {
+  background-color: var(--day-shadow);
+}
 
 @keyframes fadein {
   0% {
