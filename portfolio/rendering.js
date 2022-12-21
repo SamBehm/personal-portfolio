@@ -29,6 +29,7 @@ var initDollyComplete = false;
 
 var mouse = { x: 0, y: 0 };
 var INTERSECTED;
+var inRotation = false;
 
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
@@ -470,8 +471,6 @@ function tweenOnHover(toTween, direction) {
 
         let axis = moveableObjects[intersectedObjects[0].userData.name];
         let tl = gsap.timeline();
-        console.log(intersectedObjects);
-        console.log("//////////////////////");
 
         intersectedObjects.forEach((INTERSECTED) => {
                 let time, endPosition = modelOrigins[INTERSECTED.userData.name][axis];
@@ -537,6 +536,13 @@ function checkHover() {
 }
 
 export function onInfoExpand(object) {
+
+        if (inRotation) {
+                return;
+        }
+
+        inRotation = true;
+
         let bgColor;
         switch (object.name) {
                 case "Bookshelf":
@@ -561,11 +567,17 @@ export function onInfoExpand(object) {
                 duration: 1
         }, 0);
 
+        console.log(pivotGroup.rotation.y);
+
         tl.to(pivotGroup.rotation, {
-                y: pivotGroup.rotation.y + (2 * Math.PI),
+                y: (2 * Math.PI),
                 duration: 1,
                 ease: "power1.out",
-                overwrite: false
+                overwrite: false,
+                onComplete: () => {
+                        pivotGroup.rotation.y = 0;
+                        inRotation = false;
+                }
         }, 0);
 }
 

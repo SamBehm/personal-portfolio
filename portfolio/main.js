@@ -27,7 +27,7 @@ async function main() {
 async function initLoadingScreen() {
   try {
     let p = setupCanvas();
-    await printPreamble();
+    // await printPreamble();
     let objects = await p;
 
     setupScene(objects);
