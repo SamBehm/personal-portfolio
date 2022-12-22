@@ -83,10 +83,6 @@ body,
   opacity: 0;
 }
 
-.animFadeIn {
-  animation: fadein 5s forwards;
-}
-
 #div-content-container {
   position: relative;
   left: 5%;
@@ -106,10 +102,15 @@ body,
   border-radius: 15px;
   padding: 10px;
   transition: background-color 0.5s;
+  animation-delay: 3s;
 }
 
 #content-welcome:hover {
   background-color: var(--day-shadow);
+}
+
+.animFadeIn {
+  animation: fadein 5s forwards;
 }
 
 @keyframes fadein {
