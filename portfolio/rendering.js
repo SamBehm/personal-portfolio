@@ -392,9 +392,11 @@ function dropObjects() {
 
 function fadeIn() {
         let dnSwitch = document.getElementById("dn-switch");
-        let welcomeDiv = document.getElementById("content-welcome");
+        let contentDivs = document.getElementsByClassName("content-div");
         dnSwitch.classList.add("animFadeIn");
-        welcomeDiv.classList.add("animFadeIn");
+        Array.prototype.forEach.call(contentDivs, (element) => {
+                element.classList.add("animFadeIn");
+        })
 }
 
 function displayNavBar() {

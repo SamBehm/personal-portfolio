@@ -14,7 +14,7 @@ body,
 .fullscreen-black {
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: var(--day-midtone);
 }
 
 :root {
@@ -35,6 +35,7 @@ body,
 
 .section-main-content {
   flex-basis: 100%;
+  display: inline-block;
 }
 
 #div-wrapper {
@@ -66,9 +67,9 @@ body,
 }
 
 #model-viewer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  width: 100vw;
+  height: 100vw;
   z-index: 0;
 }
 
@@ -77,7 +78,7 @@ body,
 }
 
 #dn-switch {
-  position: absolute;
+  position: fixed;
   top: 95%;
   right: 1.5%;
   opacity: 0;
@@ -85,29 +86,34 @@ body,
 
 #div-content-container {
   position: relative;
-  left: 5%;
-  top: 35%;
-  width: 95%;
+  display: inline-block;
+  left: 4vw;
+  top: 16vw;
+  width: 80vw;
 }
 
-.content-div,
-.content-div * {}
-
-#content-welcome {
+.content-div {
   color: var(--day-highlight);
   font-family: 'Raleway', sans-serif;
-  font-size: 180%;
-  width: 22%;
+  font-size: 2rem;
+  font-weight: bolder;
   opacity: 0%;
-  border-radius: 15px;
   padding: 10px;
+  margin-bottom: 40%;
+}
+
+#content-welcome {
   transition: background-color 0.5s;
   animation-delay: 3s;
+  width: 24%;
+  border-radius: 15px;
 }
 
 #content-welcome:hover {
   background-color: var(--day-shadow);
 }
+
+#content-about-me {}
 
 .animFadeIn {
   animation: fadein 5s forwards;
