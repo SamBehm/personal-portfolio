@@ -135,7 +135,7 @@ function initScrollAnimations() {
                         start: "top bottom",
                         end: "top top",
                         scrub: 1
-                }
+                },
         });
 
         tl.to(pivotGroup.rotation, {
@@ -156,11 +156,12 @@ function initScrollAnimations() {
                 ease: "power1.out",
                 duration: 2,
                 scrollTrigger: {
+                        scroller: "#div-wrapper",
                         trigger: "#content-about-me",
                         start: "50% bottom",
                         toggleActions: "play none restart restart"
                 }
-        })
+        });
 }
 
 export function setupScene(objects) {
