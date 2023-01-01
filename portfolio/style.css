@@ -15,11 +15,20 @@ body,
   width: 100%;
   height: 100%;
   background-color: var(--day-midtone);
+  overflow: hidden;
+}
+
+/* ::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+} */
+
+.no-scroll {
+  overflow: hidden;
 }
 
 :root {
   scroll-behavior: smooth;
-  scroll-padding-top: 2rem;
 
   --day-highlight: #ffffff;
   --day-midtone: #fbe0a0;
@@ -40,6 +49,10 @@ body,
 
 #div-wrapper {
   justify-content: flex-start;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scroll-snap-type: mandatory;
+  scroll-snap-stop: always;
 }
 
 #div-screen-console {
@@ -73,10 +86,6 @@ body,
   z-index: 0;
 }
 
-#loadOverlay {
-  display: none;
-}
-
 #dn-switch {
   position: fixed;
   top: 95%;
@@ -87,33 +96,51 @@ body,
 #div-content-container {
   position: relative;
   display: inline-block;
-  left: 4vw;
-  top: 16vw;
-  width: 80vw;
+  width: 100%;
 }
 
 .content-div {
+  overflow-y: auto;
+  scroll-snap-align: center;
   color: var(--day-highlight);
   font-family: 'Raleway', sans-serif;
   font-size: 2rem;
   font-weight: bolder;
   opacity: 0%;
-  padding: 10px;
-  margin-bottom: 40%;
+  width: 100%;
+  height: 100vh;
+  scroll-snap-align: center;
 }
 
 #content-welcome {
-  transition: background-color 0.5s;
-  animation-delay: 3s;
-  width: 24%;
-  border-radius: 15px;
+  padding: 35vh 73vw 45vh 4vw;
+  animation-delay: 2.5s;
 }
 
-#content-welcome:hover {
-  background-color: var(--day-shadow);
+#content-about-me {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 4vw;
+  padding-right: 50vw;
+  z-index: 5;
 }
 
-#content-about-me {}
+.sliding-text {
+  width: 200px;
+  height: 2.8%;
+  overflow: hidden;
+  font-size: 1.2rem;
+}
+
+.sliding-text ul {
+  white-space: nowrap;
+  transform: translateX(100%);
+}
+
+.sliding-text li {
+  display: inline-block;
+}
 
 .animFadeIn {
   animation: fadein 5s forwards;
@@ -127,4 +154,8 @@ body,
   100% {
     opacity: 1;
   }
+}
+
+#loadOverlay {
+  display: none;
 }

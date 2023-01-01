@@ -11,7 +11,7 @@
   <title>Vite App</title>
 </head>
 
-<body>
+<body class="no-scroll">
   <div id="loadOverlay"
     style="background-color:black; position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:2000;">
   </div>
@@ -31,9 +31,9 @@
         <div class="nav-containers center">
           <nav>
             <ul class="nav-center-links">
-              <li><a href="#">Resume</a></li>
-              <li><a href="#">About.Me</a></li>
-              <li><a href="#">My.Work</a></li>
+              <li><a href="#content-work">My.Work</a></li>
+              <li><a href="#content-about-me">About.Me</a></li>
+              <li><a href="#content-contact">Contact</a></li>
             </ul>
           </nav>
         </div>
@@ -73,15 +73,22 @@
           <p>Start by exploring my room, or scroll down.</p>
         </div>
         <div id="content-about-me" class="content-div">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed magna quam. Nulla dolor tortor, porta
-          lacinia vestibulum scelerisque, tincidunt nec metus. Nam varius suscipit elit, non gravida justo vulputate
-          quis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nullam
-          cursus nisl libero, at sagittis nibh porta in. Vestibulum non congue odio. Duis laoreet gravida metus, at
-          vestibulum urna molestie at. Maecenas diam dui, porttitor sit amet imperdiet fermentum, faucibus et sem.
-          Phasellus eget euismod felis, non dictum dolor. Aliquam dictum orci quis dignissim pulvinar. Maecenas
-          tincidunt volutpat ex, non iaculis odio tempus eu.
+          <span style="display: inline-block">
+            &lt;01.&gt;
+            <h2 style="display: inline-block">About Me</h2>
+          </span>
+          <span class="sliding-text">
+            <ul>
+              <li>Developer</li>
+              <li>Creative Thinker</li>
+              <li>Committed Student</li>
+            </ul>
+          </span>
+          Hey there, I'm Sam! I'm a student at the University of Queensland, studying Computer Science, with a major in
+          Cyber Security. Despite my major, however, I am interested in a variety of different fields in the vast
+          universe of technology. Put simply, I love anything where I can apply creativity and efficiency!
         </div>
-        <div id="content-my-work" class="content-div">
+        <div id="content-work" class="content-div">
           Morbi ut elit consequat, facilisis enim ac, tempus risus. Aliquam dictum non libero quis elementum. Vestibulum
           ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi at eros maximus, bibendum
           mi sed, suscipit nunc. Nullam id faucibus ex. Sed mattis nulla vitae velit auctor sagittis. Suspendisse at

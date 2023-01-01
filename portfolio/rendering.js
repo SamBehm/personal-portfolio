@@ -5,9 +5,16 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { CustomEase } from "gsap/CustomEase";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 
 gsap.registerPlugin(CustomEase);
+gsap.registerPlugin(ScrollTrigger);
+
+// ScrollTrigger.defaults({
+//         immediateRender: false,
+//         ease: "power1.inOut",
+// });
 
 // Variables Setup ---------------------------|
 
@@ -29,7 +36,6 @@ var initDollyComplete = false;
 
 var mouse = { x: 0, y: 0 };
 var INTERSECTED;
-var inRotation = false;
 
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
@@ -80,7 +86,7 @@ export async function setupCanvas() {
         currentPallete = day_pallete;
 
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(day_pallete["midtone"]);
+        // scene.background = new THREE.Color(day_pallete["midtone"]);
         canvas = document.querySelector('#model-viewer');
 
         camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -88,6 +94,7 @@ export async function setupCanvas() {
                 canvas: canvas,
                 antialias: true
         });
+        renderer.setClearColor(0x000000, 0);
 
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -115,6 +122,45 @@ export async function setupCanvas() {
 
         let objects = [];
         return loadModels(objects).then((result) => loadText(result));
+}
+
+function initScrollAnimations() {
+
+        document.getElementsByClassName("no-scroll")[0].classList.remove("no-scroll");
+
+        let tl = gsap.timeline({
+                scrollTrigger: {
+                        scroller: "#div-wrapper",
+                        trigger: "#content-about-me",
+                        start: "top bottom",
+                        end: "top top",
+                        scrub: 1
+                }
+        });
+
+        tl.to(pivotGroup.rotation, {
+                x: 0.08,
+                y: (2 * Math.PI),
+                duration: 1
+        }, 0);
+
+        tl.to(pivotGroup.position, {
+                x: pivotGroup.position.x - 20,
+                z: pivotGroup.position.z - 80,
+                y: pivotGroup.position.y - 35,
+                duration: 1
+        }, 0);
+
+        gsap.to(".sliding-text ul", {
+                x: "-123%",
+                ease: "power1.out",
+                duration: 2,
+                scrollTrigger: {
+                        trigger: "#content-about-me",
+                        start: "50% bottom",
+                        toggleActions: "play none restart restart"
+                }
+        })
 }
 
 export function setupScene(objects) {
@@ -205,15 +251,15 @@ function loadText(objects) {
                                 return group;
                         };
 
-                        let bedTextGroup = createTextGeometry("BedText", "Example \nText", 2, "x");
+                        let bedTextGroup = createTextGeometry("BedText", "About. \nMe", 2, "x");
                         bedTextGroup.rotation.set(-Math.PI / 2, 0, 0);
                         bedTextGroup.position.set(3, -4, 24);
 
-                        let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Example \nText", 1.3, "y");
+                        let whiteboardTextGroup = createTextGeometry("WhiteboardText", "Contact \nMe", 1.3, "y");
                         whiteboardTextGroup.rotation.set(0, Math.PI / 2, 0);
                         whiteboardTextGroup.position.set(-15.4, 3, 26.5);
 
-                        let bookShelfTextGroup = createTextGeometry("BookshelfText", "Example \nText", 1.3, "y");
+                        let bookShelfTextGroup = createTextGeometry("BookshelfText", "My \nWork", 1.3, "y");
                         bookShelfTextGroup.rotation.set(0, Math.PI / 2, 0);
                         bookShelfTextGroup.position.set(-15.4, 11, 26.5);
 
@@ -346,7 +392,12 @@ function singleAxisSlide(objTl, name, time) {
 }
 
 function dropObjects() {
-        var objTl = gsap.timeline({ onComplete: () => { initDollyComplete = true } });
+        var objTl = gsap.timeline({
+                onComplete: () => {
+                        initDollyComplete = true;
+                        initScrollAnimations();
+                }
+        });
         var i = 0;
         for (const [key, value] of Object.entries(slideDict)) {
                 // multiAxisSlide(objTl, key, value, i);
@@ -537,58 +588,6 @@ function checkHover() {
         INTERSECTED = models[intersectedObject.name];
         let toTween = getGroupedObjects(INTERSECTED);
         tweenOnHover(toTween, 1);
-}
-
-export function onInfoExpand(object) {
-
-        if (inRotation) {
-                return;
-        }
-
-        inRotation = true;
-
-        let bgColor;
-        switch (object.name) {
-                case "Bookshelf":
-                        bgColor = new THREE.Color(0x3c1109);
-                        break;
-                case "Bed":
-                        bgColor = new THREE.Color(0x0e0e0e);
-                        break;
-                case "Whiteboard":
-                        bgColor = new THREE.Color(0xffffff);
-                        break;
-                default:
-                        throw new Error("Invalid object selected... somehow?");
-        }
-
-        let tl = gsap.timeline({
-                onComplete: () => {
-                        inRotation = false;
-                }
-        });
-
-        tl.to(scene.background, {
-                r: bgColor.r,
-                g: bgColor.g,
-                b: bgColor.b,
-                duration: 1
-        }, 0);
-
-        console.log(pivotGroup.rotation.y);
-
-        tl.to(pivotGroup.rotation, {
-                x: 0.08,
-                y: (2 * Math.PI),
-                duration: 1
-        }, 0);
-
-        tl.to(pivotGroup.position, {
-                x: pivotGroup.position.x - 20,
-                z: pivotGroup.position.z - 80,
-                y: pivotGroup.position.y - 35,
-                duration: 1
-        }, 0);
 }
 
 /**
