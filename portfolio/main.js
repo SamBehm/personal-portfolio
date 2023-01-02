@@ -58,13 +58,22 @@ async function printPreamble() {
 
 function onClickEvent(event) {
   let intersectedObject = getIntersected();
+  let element;
   switch (intersectedObject.name) {
     case "Bed":
-      document.getElementById("content-about-me").scrollIntoView();
+      element = document.getElementById("content-about-me");
+      break;
+    case "Whiteboard":
+      element = document.getElementById("content-contact");
       return;
+    case "Bookshelf":
+      element = document.getElementById("content-work");
+      break;
     default:
       return;
   }
+
+  element.scrollIntoView();
 }
 
 main();

@@ -6,6 +6,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { CustomEase } from "gsap/CustomEase";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { DodecahedronGeometry, Mesh, MeshBasicMaterial } from 'three';
 
 
 gsap.registerPlugin(CustomEase);
@@ -22,6 +23,7 @@ gsap.registerPlugin(ScrollTrigger);
 var scene;
 var canvas;
 var style;
+var tick = 0;
 
 var camera;
 var renderer;
@@ -65,6 +67,9 @@ var moveableObjects = {
 
 var modelOrigins = {};
 var textMeshes = {};
+
+var orbitObjects = [];
+var orbitDistance = { x: 500, y: 333 };
 
 var day_pallete = {};
 var night_pallete = {};
@@ -120,6 +125,8 @@ export async function setupCanvas() {
 
         document.addEventListener("mousemove", mouseMoveEvent, false);
 
+        generateOrbitObjects(12);
+
         let objects = [];
         return loadModels(objects).then((result) => loadText(result));
 }
@@ -140,7 +147,7 @@ function initScrollAnimations() {
 
         tl.to(pivotGroup.rotation, {
                 x: 0.08,
-                y: (2 * Math.PI),
+                y: (1.94 * Math.PI),
                 duration: 1
         }, 0);
 
@@ -151,6 +158,17 @@ function initScrollAnimations() {
                 duration: 1
         }, 0);
 
+        tl.to(orbitObjects[0].material, {
+                opacity: 1,
+                duration: 1
+        }, 0);
+
+        tl.to(orbitDistance, {
+                x: 30,
+                y: 20,
+                duration: 1
+        }, 0);
+
         gsap.to(".sliding-text ul", {
                 x: "-123%",
                 ease: "power1.out",
@@ -158,7 +176,7 @@ function initScrollAnimations() {
                 scrollTrigger: {
                         scroller: "#div-wrapper",
                         trigger: "#content-about-me",
-                        start: "50% bottom",
+                        start: "bottom %",
                         toggleActions: "play none restart restart"
                 }
         });
@@ -282,7 +300,44 @@ function loadText(objects) {
 
 }
 
+function generateOrbitObjects(numObjects) {
 
+        let material = new MeshBasicMaterial({ color: currentPallete["highlight"], wireframe: true });
+        material.transparent = true;
+        material.opacity = 0;
+
+        let cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+        let dodGeometry = new DodecahedronGeometry(5, 0);
+
+        for (let i = 0; i < numObjects; i++) {
+                let object;
+                if (i % 2) {
+                        object = new THREE.Mesh(cubeGeometry, material);
+                } else {
+                        object = new THREE.Mesh(dodGeometry, material);
+                }
+
+                pivotGroup.add(object);
+                orbitObjects.push(object);
+        }
+}
+
+function rotateOrbitObjects() {
+        orbitObjects.forEach((object, i) => {
+                let origin = i * (2 * Math.PI) / orbitObjects.length;
+                let angle = (origin + (tick / 20)) % (2 * Math.PI);
+                if (i % 2) {
+                        object.position.x = Math.cos(angle) * orbitDistance.x;
+                        object.position.y = Math.sin(angle) * orbitDistance.y;
+                } else {
+                        object.position.x = Math.sin(angle) * orbitDistance.x;
+                        object.position.y = Math.cos(angle) * orbitDistance.y;
+                }
+
+                object.position.z = Math.sin(origin + (tick / 15) % (2 * Math.PI)) * orbitDistance.x;
+                object.rotation.x = (tick / 10) % (2 * Math.PI);
+        });
+}
 
 function createBoundingBox(object) {
         const bbox = new THREE.Box3();
@@ -599,12 +654,15 @@ function checkHover() {
 export function animate() {
         requestAnimationFrame(animate);
 
+        tick++;
+
         if (initDollyComplete) {
                 checkHover();
         }
         // controls.update();
-
+        rotateOrbitObjects();
         renderer.render(scene, camera);
+
 }
 
 function onWindowResize() {
