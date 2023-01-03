@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { CustomEase } from "gsap/CustomEase";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DodecahedronGeometry, Mesh, MeshBasicMaterial } from 'three';
+import jsonURL from './Roboto_Black.json?url';
 
 
 gsap.registerPlugin(CustomEase);
@@ -238,7 +239,7 @@ function loadModels(objects) {
 function loadText(objects) {
         const loader = new FontLoader();
         return new Promise((resolve, reject) => {
-                loader.load('Roboto_Black.json', function (font) {
+                loader.load(jsonURL, function (font) {
                         let createTextGeometry = (name, text, size, axis) => {
 
                                 const meshMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(currentPallete["highlight"]), transparent: true, opacity: 0 });
