@@ -1,5 +1,4 @@
-import './style.css'
-import { setupCanvas, animate, initDolly, getIntersected, setupScene } from './rendering'
+import { setupCanvas, animate, initDolly, getIntersected, setupScene } from './rendering.js'
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
