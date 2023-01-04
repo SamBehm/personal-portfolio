@@ -40,6 +40,8 @@ var initDollyComplete = false;
 var mouse = { x: 0, y: 0 };
 var INTERSECTED;
 
+var mainContentDiv;
+
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
 var slideDict = {
@@ -111,11 +113,9 @@ export async function setupCanvas() {
         camera.updateProjectionMatrix();
 
         pivotGroup = new THREE.Object3D();
+        pivotGroup.name = "PivotGroup";
 
         window.addEventListener('resize', onWindowResize, false);
-
-
-
         /* Debugging Controls commented out below - remember to uncomment update in animation function */
 
         // controls = new OrbitControls(camera, renderer.domElement);
@@ -125,6 +125,8 @@ export async function setupCanvas() {
         // });
 
         document.addEventListener("mousemove", mouseMoveEvent, false);
+
+        mainContentDiv = document.getElementById('div-wrapper');
 
         generateOrbitObjects(12);
 
@@ -616,6 +618,10 @@ function checkHover() {
 
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
+        if (mainContentDiv.scrollTop > 0) {
+                intersectedObjects = [];
+        }
+
         if (intersectedObjects.length == 0) {
                 if (INTERSECTED) {
                         let toTween = getGroupedObjects(INTERSECTED);
@@ -681,5 +687,14 @@ function mouseMoveEvent(event) {
 }
 
 export function getIntersected() {
+        if (mainContentDiv.scrollTop > 0) {
+                var raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, camera);
+
+                if (raycaster.intersectObjects(scene.children).length > 0) {
+                        return pivotGroup;
+                }
+        }
+
         return INTERSECTED;
 }

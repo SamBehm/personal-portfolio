@@ -58,7 +58,11 @@ async function printPreamble() {
 function onClickEvent(event) {
   let intersectedObject = getIntersected();
   let element;
+
   switch (intersectedObject.name) {
+    case "PivotGroup":
+      document.getElementById("div-wrapper").scrollTo({ top: 0 });
+      return;
     case "Bed":
       element = document.getElementById("content-about-me");
       break;
