@@ -663,6 +663,10 @@ export function animate() {
 
         tick++;
 
+        if (tick > 100000) {
+                tick = 0;
+        }
+
         if (initDollyComplete) {
                 checkHover();
         }
