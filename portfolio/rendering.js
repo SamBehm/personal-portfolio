@@ -73,6 +73,8 @@ var textMeshes = {};
 
 var orbitObjects = [];
 var orbitDistance = { x: 500, y: 333 };
+var orbitSpeed = 1;
+
 
 var day_pallete = {};
 var night_pallete = {};
@@ -94,7 +96,7 @@ export async function setupCanvas() {
         currentPallete = day_pallete;
 
         scene = new THREE.Scene();
-        // scene.background = new THREE.Color(day_pallete["midtone"]);
+
         canvas = document.querySelector('#model-viewer');
 
         camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -171,6 +173,33 @@ function initScrollAnimations() {
                 y: 20,
                 duration: 1
         }, 0);
+
+        const container = document.getElementById("horizontal-container");
+        const horizontal = container.querySelector(".horizontal");
+        const horizontalContentDiv = container.querySelector(".content-div");
+
+        gsap.to(horizontal, {
+                x: () => { return -(container.offsetWidth) },
+                ease: "none",
+                scrollTrigger: {
+                        scroller: "#div-wrapper",
+                        trigger: container,
+                        start: () => "center center",
+                        end: () => "+=" + (container.offsetWidth / 2),
+                        scrub: true,
+                        pin: true,
+                        invalidateOnRefresh: true,
+                        pinType: "fixed",
+                        anticipatePin: 1,
+                        snap: {
+                                snapTo: [0, 1],
+                                directional: false,
+                                inertia: true,
+                                duration: { min: 0.5, max: 1.2 },
+                                delay: 0.05
+                        }
+                }
+        });
 
         gsap.to(".sliding-text ul", {
                 x: "-123%",
@@ -619,6 +648,7 @@ function checkHover() {
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
         if (mainContentDiv.scrollTop > 0) {
+                orbitSpeed = intersectedObjects.length > 0 ? 0.5 : 1;
                 intersectedObjects = [];
         }
 
@@ -661,17 +691,20 @@ function checkHover() {
 export function animate() {
         requestAnimationFrame(animate);
 
-        tick++;
 
-        if (tick > 100000) {
-                tick = 0;
-        }
 
         if (initDollyComplete) {
                 checkHover();
         }
         // controls.update();
+
+        tick += orbitSpeed;
+
+        if (tick > 10000) {
+                tick = 0;
+        }
         rotateOrbitObjects();
+
         renderer.render(scene, camera);
 
 }

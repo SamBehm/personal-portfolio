@@ -56,27 +56,29 @@ async function printPreamble() {
 }
 
 function onClickEvent(event) {
+
   let intersectedObject = getIntersected();
-  let element;
+  let divWrapper = document.getElementById("div-wrapper");
+  let scrollPosition = 0
+  let baseScroll = window.innerHeight + 5;
 
   switch (intersectedObject.name) {
-    case "PivotGroup":
-      document.getElementById("div-wrapper").scrollTo({ top: 0 });
-      return;
     case "Bed":
-      element = document.getElementById("content-about-me");
+      scrollPosition = baseScroll + 2;
+      break;
+    case "Bookshelf":
+      scrollPosition = baseScroll * 2;
       break;
     case "Whiteboard":
-      element = document.getElementById("content-contact");
-      return;
-    case "Bookshelf":
-      element = document.getElementById("content-work");
+      scrollPosition = baseScroll * 3;
+      break;
+    case "PivotGroup":
       break;
     default:
       return;
   }
 
-  element.scrollIntoView();
+  divWrapper.scrollTo({ top: scrollPosition, behavior: "smooth" });
 }
 
 main();
