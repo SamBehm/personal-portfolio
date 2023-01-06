@@ -21,6 +21,15 @@ async function main() {
 
   document.addEventListener('click', onClickEvent);
 
+  const linkAbout = document.getElementById("link-about");
+  const linkWork = document.getElementById("link-work");
+  const linkContact = document.getElementById("link-contact");
+
+  linkAbout.onclick = (e) => { e.preventDefault(); return triggerScroll("Bed") };
+  linkWork.onclick = (e) => { e.preventDefault(); return triggerScroll("Bookshelf") };
+  linkContact.onclick = (e) => { e.preventDefault(); return triggerScroll("Whiteboard") };
+
+
   animate();
 }
 
@@ -62,11 +71,16 @@ async function printPreamble() {
 function onClickEvent(event) {
 
   let intersectedObject = getIntersected();
+  triggerScroll(intersectedObject.name);
+
+}
+
+function triggerScroll(name) {
   let duration = 0.5;
   let scrollTarget = 0;
   let offsetY = 0;
 
-  switch (intersectedObject.name) {
+  switch (name) {
     case "Bed":
       duration = 1;
       scrollTarget = "#content-about-me";
@@ -82,10 +96,11 @@ function onClickEvent(event) {
     case "PivotGroup":
       break;
     default:
-      return;
+      return false;
   }
 
   gsap.to(window, { duration: duration, scrollTo: { y: scrollTarget, offsetY: -offsetY } });
+  return false;
 }
 
 main();
