@@ -62,7 +62,7 @@ async function printPreamble() {
 function onClickEvent(event) {
 
   let intersectedObject = getIntersected();
-  let duration = 2;
+  let duration = 0.5;
   let scrollTarget = 0;
   let offsetY = 0;
 
@@ -85,7 +85,7 @@ function onClickEvent(event) {
       return;
   }
 
-  gsap.to(window, { duration: 2, scrollTo: { y: scrollTarget, offsetY: -offsetY } });
+  gsap.to(window, { duration: duration, scrollTo: { y: scrollTarget, offsetY: -offsetY } });
 }
 
 main();

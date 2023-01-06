@@ -145,8 +145,9 @@ function initScrollAnimations() {
 
         // Model End Position after scrolling from about me to my work
         const horizontalEndPos = {
-                x: pivotGroup.position.x - 100,
-                z: pivotGroup.position.z + 15,
+                x: () => { return pivotGroup.position.x - 60 },
+                y: () => { return pivotGroup.position.y },
+                z: () => { return pivotGroup.position.z + 60 },
         };
 
         let tl = gsap.timeline({
@@ -184,9 +185,8 @@ function initScrollAnimations() {
 
         let panelsContainer = document.querySelector("#panels-container");
         const panels = gsap.utils.toArray("#panels-container .panel");
-        gsap.to(panels, {
-                xPercent: -100 * (panels.length - 1),
-                ease: "none",
+
+        const horizontalTL = gsap.timeline({
                 scrollTrigger: {
                         trigger: "#panels-container",
                         pin: true,
@@ -202,56 +202,33 @@ function initScrollAnimations() {
                 }
         });
 
+        horizontalTL.to(panels, {
+                xPercent: -100 * (panels.length - 1),
+                ease: "none",
+        }, 0);
 
+        horizontalTL.to(pivotGroup.position, {
+                x: horizontalEndPos.x,
+                y: horizontalEndPos.y,
+                z: horizontalEndPos.z,
+                ease: "none"
+        }, 0);
 
-        // const container = document.getElementById("horizontal-container");
-        // const horizontal = container.querySelector(".horizontal");
-        // const horizontalContentDiv = container.querySelector(".content-div");
+        horizontalTL.to(pivotGroup.rotation, {
+                x: 0,
+                y: 4 * Math.PI + 0.5,
+        }, 0);
 
-        // const horizontalTl = gsap.timeline({
-        //         scrollTrigger: {
-        //                 scroller: "#div-wrapper",
-        //                 trigger: container,
-        //                 start: () => "center center",
-        //                 end: () => "+=" + (container.offsetWidth / 2),
-        //                 scrub: true,
-        //                 pin: true,
-        //                 invalidateOnRefresh: true,
-        //                 pinType: "fixed",
-        //                 // snap: {
-        //                 //         snapTo: [0, 1],
-        //                 //         directional: false,
-        //                 //         inertia: true,
-        //                 //         duration: { min: 0.5, max: 1.2 },
-        //                 //         delay: 0.05
-        //                 // }
-        //         },
-        //         onStart: () => { hoverInteractEnabled = false },
-        //         onComplete: () => { hoverInteractEnabled = true }
-        // })
-
-        // horizontalTl.to(horizontal, {
-        //         x: () => { return -(container.offsetWidth) },
-        //         ease: "none"
-        // }, 0);
-
-        // horizontalTl.to(pivotGroup.position, {
-        //         x: horizontalEndPos.x,
-        //         z: horizontalEndPos.z,
-        //         ease: "none"
-        // }, 0);
-
-        // gsap.to(".sliding-text ul", {
-        //         x: "-123%",
-        //         ease: "power1.out",
-        //         duration: 2,
-        //         scrollTrigger: {
-        //                 scroller: "#div-wrapper",
-        //                 trigger: "#content-about-me",
-        //                 start: "bottom %",
-        //                 toggleActions: "play none restart restart"
-        //         }
-        // });
+        gsap.to(".sliding-text ul", {
+                x: "-123%",
+                ease: "power1.out",
+                duration: 2,
+                scrollTrigger: {
+                        trigger: "#content-about-me",
+                        start: "bottom bottom",
+                        toggleActions: "play restart restart restart"
+                }
+        });
 
 
 }

@@ -124,7 +124,7 @@ body,
 
 #horizontal-container #panels-container .panel {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   display: -webkit-box;
@@ -133,11 +133,21 @@ body,
   flex-direction: column;
 }
 
-#content-about-me {
-  padding: 35vh 70vw 10vh 3vw;
+.panel-inner-container {
+  height: 100vh;
+  display: block;
+  overflow: hidden;
 }
 
-#content-work {}
+#content-about-me {
+  width: 100%;
+  height: 100%;
+  padding: 35vh 50vw 10vh 3vw;
+}
+
+#content-work {
+  padding: 35vh 3vw 10vh 0vw
+}
 
 #content-contact {
   display: block;
@@ -145,8 +155,8 @@ body,
 }
 
 .sliding-text {
+  height: fit-content;
   width: 200px;
-  height: 2.8%;
   overflow: hidden;
   font-size: 1.2rem;
 }
