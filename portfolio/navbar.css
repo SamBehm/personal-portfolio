@@ -1,12 +1,12 @@
 header {
         position: relative;
+        height: 10vh;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 30px 9% 30px 10%;
         font-family: 'Raleway', sans-serif;
         background-image: linear-gradient(var(--day-shadow), var(--day-midtone));
-        z-index: 10;
 }
 
 header * {
@@ -16,7 +16,6 @@ header * {
         font-size: 24px;
         color: var(--day-highlight);
         text-decoration: none;
-        z-index: 5;
 }
 
 ul {

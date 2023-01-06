@@ -1,4 +1,8 @@
 import { setupCanvas, animate, initDolly, getIntersected, setupScene } from './rendering.js'
+import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+
+gsap.registerPlugin(ScrollToPlugin);
 
 const speed = 50;
 const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio.git",
@@ -58,19 +62,22 @@ async function printPreamble() {
 function onClickEvent(event) {
 
   let intersectedObject = getIntersected();
-  let divWrapper = document.getElementById("div-wrapper");
-  let scrollPosition = 0
-  let baseScroll = window.innerHeight + 5;
+  let duration = 2;
+  let scrollTarget = 0;
+  let offsetY = 0;
 
   switch (intersectedObject.name) {
     case "Bed":
-      scrollPosition = baseScroll + 2;
+      duration = 1;
+      scrollTarget = "#content-about-me";
       break;
     case "Bookshelf":
-      scrollPosition = baseScroll * 2;
+      duration = 1;
+      scrollTarget = "#content-about-me";
+      offsetY = 50;
       break;
     case "Whiteboard":
-      scrollPosition = baseScroll * 3;
+      scrollTarget = "#content-contact";
       break;
     case "PivotGroup":
       break;
@@ -78,7 +85,7 @@ function onClickEvent(event) {
       return;
   }
 
-  divWrapper.scrollTo({ top: scrollPosition, behavior: "smooth" });
+  gsap.to(window, { duration: 2, scrollTo: { y: scrollTarget, offsetY: -offsetY } });
 }
 
 main();

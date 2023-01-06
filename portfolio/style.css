@@ -15,6 +15,9 @@ body,
   width: 100%;
   height: 100%;
   background-color: var(--day-midtone);
+}
+
+.noscroll {
   overflow: hidden;
 }
 
@@ -23,13 +26,7 @@ body,
   background: transparent;
 } */
 
-.no-scroll {
-  overflow: hidden;
-}
-
 :root {
-  scroll-behavior: smooth;
-
   --day-highlight: #ffffff;
   --day-midtone: #fbe0a0;
   --day-shadow: #ffbe26;
@@ -51,8 +48,6 @@ body,
   background: none;
   position: relative;
   justify-content: flex-start;
-  overflow-y: scroll;
-  overflow-x: hidden;
   z-index: 20;
 }
 
@@ -101,9 +96,7 @@ body,
   overflow: hidden;
 }
 
-.content-div {
-  overflow-y: auto;
-  scroll-snap-align: center;
+.content-container {
   color: var(--day-highlight);
   font-family: 'Raleway', sans-serif;
   font-size: 2rem;
@@ -112,46 +105,44 @@ body,
   width: 100%;
 }
 
-#horizontal-container {
-  height: 100vh;
-  width: 100%;
+#content-welcome {
+  display: block;
+  padding: 17vw 74vw 20vw 3vw;
+  height: 90vh;
 }
 
-.horizontal {
-  width: 100%;
+#horizontal-container #panels-container {
   height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  padding: 0;
+  overflow: hidden;
 }
 
-.horizontal>div {
+#horizontal-container #panels-container .panel {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  flex-shrink: 0;
-  height: 100%;
-  width: 45vw;
-}
-
-#content-welcome {
-  padding: 35vh 73vw 45vh 4vw;
-  animation-delay: 2.5s;
 }
 
 #content-about-me {
-  padding-left: 5vw;
-  margin-right: 55vw;
+  padding: 35vh 70vw 10vh 3vw;
 }
 
-#content-work {
-  margin-left: 55vw;
-  padding-right: 5vw;
-  text-align: right;
-}
+#content-work {}
 
+#content-contact {
+  display: block;
+  height: 100vh;
+}
 
 .sliding-text {
   width: 200px;
@@ -167,11 +158,6 @@ body,
 
 .sliding-text li {
   display: inline-block;
-}
-
-#content-contact {
-  width: 100vw;
-  height: 100vh;
 }
 
 .animFadeIn {

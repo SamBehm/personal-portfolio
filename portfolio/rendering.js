@@ -37,10 +37,9 @@ var pointLightShelf;
 
 var initDollyComplete = false;
 
+var hoverInteractEnabled = true;
 var mouse = { x: 0, y: 0 };
 var INTERSECTED;
-
-var mainContentDiv;
 
 /* directions are added in case I wanna slide objects in 
    based on an axis - see multiAxisSlide function */
@@ -128,8 +127,6 @@ export async function setupCanvas() {
 
         document.addEventListener("mousemove", mouseMoveEvent, false);
 
-        mainContentDiv = document.getElementById('div-wrapper');
-
         generateOrbitObjects(12);
 
         let objects = [];
@@ -138,16 +135,27 @@ export async function setupCanvas() {
 
 function initScrollAnimations() {
 
-        document.getElementsByClassName("no-scroll")[0].classList.remove("no-scroll");
+        // Model End Position after scrolling down from the welcome
+        // to about me
+        const welcomeEndPosition = {
+                x: pivotGroup.position.x - 20,
+                z: pivotGroup.position.z - 80,
+                y: pivotGroup.position.y - 35,
+        };
+
+        // Model End Position after scrolling from about me to my work
+        const horizontalEndPos = {
+                x: pivotGroup.position.x - 100,
+                z: pivotGroup.position.z + 15,
+        };
 
         let tl = gsap.timeline({
                 scrollTrigger: {
-                        scroller: "#div-wrapper",
-                        trigger: "#content-about-me",
-                        start: "top bottom",
-                        end: "top top",
+                        trigger: "#content-welcome",
+                        start: "top top",
+                        end: "bottom top",
                         scrub: 1
-                },
+                }
         });
 
         tl.to(pivotGroup.rotation, {
@@ -157,9 +165,9 @@ function initScrollAnimations() {
         }, 0);
 
         tl.to(pivotGroup.position, {
-                x: pivotGroup.position.x - 20,
-                z: pivotGroup.position.z - 80,
-                y: pivotGroup.position.y - 35,
+                x: welcomeEndPosition.x,
+                y: welcomeEndPosition.y,
+                z: welcomeEndPosition.z,
                 duration: 1
         }, 0);
 
@@ -174,44 +182,78 @@ function initScrollAnimations() {
                 duration: 1
         }, 0);
 
-        const container = document.getElementById("horizontal-container");
-        const horizontal = container.querySelector(".horizontal");
-        const horizontalContentDiv = container.querySelector(".content-div");
-
-        gsap.to(horizontal, {
-                x: () => { return -(container.offsetWidth) },
+        let panelsContainer = document.querySelector("#panels-container");
+        const panels = gsap.utils.toArray("#panels-container .panel");
+        gsap.to(panels, {
+                xPercent: -100 * (panels.length - 1),
                 ease: "none",
                 scrollTrigger: {
-                        scroller: "#div-wrapper",
-                        trigger: container,
-                        start: () => "center center",
-                        end: () => "+=" + (container.offsetWidth / 2),
-                        scrub: true,
+                        trigger: "#panels-container",
                         pin: true,
-                        invalidateOnRefresh: true,
-                        pinType: "fixed",
+                        start: "top top",
+                        scrub: 1,
                         anticipatePin: 1,
                         snap: {
-                                snapTo: [0, 1],
-                                directional: false,
-                                inertia: true,
-                                duration: { min: 0.5, max: 1.2 },
-                                delay: 0.05
-                        }
+                                snapTo: 1 / (panels.length - 1),
+                                inertia: false,
+                                duration: { min: 0.1, max: 0.1 }
+                        },
+                        end: () => "+=" + (panelsContainer.offsetWidth - innerWidth)
                 }
         });
 
-        gsap.to(".sliding-text ul", {
-                x: "-123%",
-                ease: "power1.out",
-                duration: 2,
-                scrollTrigger: {
-                        scroller: "#div-wrapper",
-                        trigger: "#content-about-me",
-                        start: "bottom %",
-                        toggleActions: "play none restart restart"
-                }
-        });
+
+
+        // const container = document.getElementById("horizontal-container");
+        // const horizontal = container.querySelector(".horizontal");
+        // const horizontalContentDiv = container.querySelector(".content-div");
+
+        // const horizontalTl = gsap.timeline({
+        //         scrollTrigger: {
+        //                 scroller: "#div-wrapper",
+        //                 trigger: container,
+        //                 start: () => "center center",
+        //                 end: () => "+=" + (container.offsetWidth / 2),
+        //                 scrub: true,
+        //                 pin: true,
+        //                 invalidateOnRefresh: true,
+        //                 pinType: "fixed",
+        //                 // snap: {
+        //                 //         snapTo: [0, 1],
+        //                 //         directional: false,
+        //                 //         inertia: true,
+        //                 //         duration: { min: 0.5, max: 1.2 },
+        //                 //         delay: 0.05
+        //                 // }
+        //         },
+        //         onStart: () => { hoverInteractEnabled = false },
+        //         onComplete: () => { hoverInteractEnabled = true }
+        // })
+
+        // horizontalTl.to(horizontal, {
+        //         x: () => { return -(container.offsetWidth) },
+        //         ease: "none"
+        // }, 0);
+
+        // horizontalTl.to(pivotGroup.position, {
+        //         x: horizontalEndPos.x,
+        //         z: horizontalEndPos.z,
+        //         ease: "none"
+        // }, 0);
+
+        // gsap.to(".sliding-text ul", {
+        //         x: "-123%",
+        //         ease: "power1.out",
+        //         duration: 2,
+        //         scrollTrigger: {
+        //                 scroller: "#div-wrapper",
+        //                 trigger: "#content-about-me",
+        //                 start: "bottom %",
+        //                 toggleActions: "play none restart restart"
+        //         }
+        // });
+
+
 }
 
 export function setupScene(objects) {
@@ -530,12 +572,14 @@ function dropObjects() {
 }
 
 function fadeIn() {
+        document.body.classList.remove("noscroll");
+
         let dnSwitch = document.getElementById("dn-switch");
-        let contentDivs = document.getElementsByClassName("content-div");
+        let contentDivs = document.getElementsByClassName("content-container");
         dnSwitch.classList.add("animFadeIn");
         Array.prototype.forEach.call(contentDivs, (element) => {
                 element.classList.add("animFadeIn");
-        })
+        });
 }
 
 function displayNavBar() {
@@ -642,14 +686,19 @@ function tweenOnHover(toTween, direction) {
 }
 
 function checkHover() {
+
         var raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(mouse, camera);
 
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
-        if (mainContentDiv.scrollTop > 0) {
-                orbitSpeed = intersectedObjects.length > 0 ? 0.5 : 1;
+        if ((document.documentElement.scrollTop || document.body.scrollTop) > 0) {
                 intersectedObjects = [];
+
+                if (hoverInteractEnabled) {
+                        orbitSpeed = intersectedObjects.length > 0 ? 0.5 : 1;
+                }
+
         }
 
         if (intersectedObjects.length == 0) {
@@ -692,7 +741,6 @@ export function animate() {
         requestAnimationFrame(animate);
 
 
-
         if (initDollyComplete) {
                 checkHover();
         }
@@ -724,7 +772,12 @@ function mouseMoveEvent(event) {
 }
 
 export function getIntersected() {
-        if (mainContentDiv.scrollTop > 0) {
+
+        if (!hoverInteractEnabled) {
+                return null;
+        }
+
+        if ((document.documentElement.scrollTop || document.body.scrollTop) > 0) {
                 var raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(mouse, camera);
 
