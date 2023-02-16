@@ -217,6 +217,21 @@ body,
   height: 15vh;
 }
 
+.project-listing.active-project-listing .project-listing-expand-arrow {
+  display: none;
+}
+
+.project-listing-expand-arrow {
+  width: 2vh;
+  height: 2vh;
+  padding: 10px;
+  border: solid var(--day-highlight);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  margin-top: 2vh;
+}
+
 .project-listing-info {
   margin-top: 3vh;
   width: 100%;
