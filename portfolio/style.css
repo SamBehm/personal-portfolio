@@ -176,16 +176,30 @@ body,
 
 .project-listing {
   display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 10vh;
+  padding: 2vh;
+  padding-top: 2.5vh;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  transition: 0.2s;
+  cursor: pointer;
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+
+.project-listing-header {
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 2%;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
-.project-listing>a {
+.project-listing-header>a {
   width: 3.5rem;
   display: flex;
   align-items: center;
@@ -193,11 +207,33 @@ body,
   padding-left: 10px;
 }
 
-.project-listing>a>svg {
+.project-listing-header>a>svg {
   display: block;
   position: relative;
   fill: var(--day-highlight);
 }
+
+.project-listing:not(.active-project-listing):hover {
+  height: 15vh;
+}
+
+.project-listing-info {
+  margin-top: 3vh;
+  width: 100%;
+  font-size: 1.2rem;
+  overflow: hidden;
+}
+
+.active-project-listing {
+  height: fit-content;
+}
+
+
+/* 
+#work-list>li:nth-of-type(1) .project-listing:hover #water-div {
+  background-color: aqua;
+  animation: water 4s ease-in-out;
+} */
 
 #content-contact {
   display: block;

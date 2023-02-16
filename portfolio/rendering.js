@@ -669,8 +669,6 @@ function checkHover() {
 
         var intersectedObjects = raycaster.intersectObjects(scene.children);
 
-        console.log((document.documentElement.scrollTop || document.body.scrollTop));
-
         if ((document.documentElement.scrollTop || document.body.scrollTop) > 0) {
                 intersectedObjects = [];
 

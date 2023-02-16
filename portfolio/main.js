@@ -15,13 +15,12 @@ const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio
   "Resolving deltas: 100% (143/143), done.",
   "Welcome!"];
 
-window.onbeforeunload = () => { window.scrollTo(0, 0) }
-
 async function main() {
   await initLoadingScreen();
   initDolly();
 
   document.addEventListener('click', onClickEvent);
+  window.onbeforeunload = () => { window.scrollTo(0, 0) };
 
   const linkAbout = document.getElementById("link-about");
   const linkWork = document.getElementById("link-work");
@@ -31,8 +30,16 @@ async function main() {
   linkWork.onclick = (e) => { e.preventDefault(); return triggerScroll("Bookshelf") };
   linkContact.onclick = (e) => { e.preventDefault(); return triggerScroll("Whiteboard") };
 
+  const projectListings = document.getElementsByClassName("project-listing");
+  for (let i = 0; i < projectListings.length; i++) {
+    const listing = projectListings[i];
+    listing.onclick = (e) => {
+      e.stopPropagation();
+      listing.classList.toggle("active-project-listing");
+    };
 
-  animate();
+    animate();
+  }
 }
 
 /**
