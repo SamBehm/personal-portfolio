@@ -135,18 +135,68 @@ body,
 
 .panel-inner-container {
   height: 100vh;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   overflow: hidden;
 }
 
 #content-about-me {
   width: 100%;
   height: 100%;
-  padding: 35vh 50vw 10vh 3vw;
+  padding: 10vh 50vw 10vh 3vw;
 }
 
 #content-work {
-  padding: 35vh 3vw 10vh 0vw
+  padding: 10vh 0vw 10vh 0vw
+}
+
+#my-work-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  left: 54%;
+  width: 40%;
+  height: 70%;
+}
+
+#work-list {
+  width: 100%;
+}
+
+#work-list>li {
+  width: 100%;
+  margin-top: 2%;
+  padding: 2%;
+  padding-left: 0%;
+}
+
+.project-listing {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.project-listing>a {
+  width: 3.5rem;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  padding-left: 10px;
+}
+
+.project-listing>a>svg {
+  display: block;
+  position: relative;
+  fill: var(--day-highlight);
 }
 
 #content-contact {

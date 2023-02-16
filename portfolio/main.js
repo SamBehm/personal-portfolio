@@ -15,6 +15,8 @@ const console_text = ["> git clone https://github.com/SamBehm/personal-portfolio
   "Resolving deltas: 100% (143/143), done.",
   "Welcome!"];
 
+window.onbeforeunload = () => { window.scrollTo(0, 0) }
+
 async function main() {
   await initLoadingScreen();
   initDolly();
