@@ -72,7 +72,7 @@ var textMeshes = {};
 
 var orbitObjects = [];
 var orbitDistance = { x: 500, y: 333 };
-var orbitSpeed = 1;
+var orbitSpeed = 500;
 
 
 var day_pallete = {};
@@ -373,10 +373,10 @@ function generateOrbitObjects(numObjects) {
         }
 }
 
-function rotateOrbitObjects() {
+function rotateOrbitObjects(orbitTick) {
         orbitObjects.forEach((object, i) => {
                 let origin = i * (2 * Math.PI) / orbitObjects.length;
-                let angle = (origin + (tick / 20)) % (2 * Math.PI);
+                let angle = (origin + (orbitTick / 20)) % (2 * Math.PI);
                 if (i % 2) {
                         object.position.x = Math.cos(angle) * orbitDistance.x;
                         object.position.y = Math.sin(angle) * orbitDistance.y;
@@ -385,7 +385,7 @@ function rotateOrbitObjects() {
                         object.position.y = Math.cos(angle) * orbitDistance.y;
                 }
 
-                object.position.z = Math.sin(origin + (tick / 15) % (2 * Math.PI)) * orbitDistance.x;
+                object.position.z = Math.sin(origin + (orbitTick / 15) % (2 * Math.PI)) * orbitDistance.x;
                 object.rotation.x = (tick / 10) % (2 * Math.PI);
         });
 }
@@ -723,12 +723,15 @@ export function animate() {
         }
         // controls.update();
 
-        tick += orbitSpeed;
-
         if (tick > 10000) {
                 tick = 0;
         }
-        rotateOrbitObjects();
+
+        tick++;
+
+        if (!(tick % orbitSpeed)) {
+                rotateOrbitObjects(tick / orbitSpeed);
+        }
 
         renderer.render(scene, camera);
 
