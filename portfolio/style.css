@@ -207,14 +207,27 @@ body,
   padding-left: 10px;
 }
 
+.project-listing-header>a:hover svg {
+  fill: black;
+  transition: 0.2s;
+}
+
 .project-listing-header>a>svg {
   display: block;
   position: relative;
   fill: var(--day-highlight);
+  transition: 0.2s;
 }
 
 .project-listing:not(.active-project-listing):hover {
-  height: 15vh;
+  height: 12vh;
+  background-color: var(--day-shadow);
+  transition: 0.2;
+}
+
+.project-listing:not(.active-project-listing):hover .project-listing-expand-arrow {
+  opacity: 1;
+  transition: 0.2s;
 }
 
 .project-listing.active-project-listing .project-listing-expand-arrow {
@@ -222,6 +235,7 @@ body,
 }
 
 .project-listing-expand-arrow {
+  opacity: 0;
   width: 2vh;
   height: 2vh;
   padding: 10px;
@@ -229,7 +243,7 @@ body,
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
-  margin-top: 2vh;
+  transition: 0.2s;
 }
 
 .project-listing-info {
@@ -241,6 +255,7 @@ body,
 
 .active-project-listing {
   height: fit-content;
+  background-color: var(--day-shadow);
 }
 
 
