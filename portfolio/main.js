@@ -35,6 +35,20 @@ async function main() {
     const listing = projectListings[i];
     listing.onclick = (e) => {
       e.stopPropagation();
+
+      if (!listing.classList.contains("active-project-listing")) {
+        for (let j = 0; j < projectListings.length; j++) {
+          if (i == j) {
+            continue;
+          }
+
+          if (projectListings[j].classList.contains("active-project-listing")) {
+            projectListings[j].classList.remove("active-project-listing");
+            break;
+          }
+        }
+      }
+
       listing.classList.toggle("active-project-listing");
     };
 
