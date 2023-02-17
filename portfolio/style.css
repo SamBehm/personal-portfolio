@@ -180,7 +180,7 @@ body,
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  height: 10vh;
+  max-height: 10vh;
   padding: 2vh;
   padding-top: 2.5vh;
   border-radius: 10px;
@@ -220,7 +220,7 @@ body,
 }
 
 .project-listing:not(.active-project-listing):hover {
-  height: 12vh;
+  max-height: 12vh;
   background-color: var(--day-shadow);
   transition: 0.2;
 }
@@ -254,7 +254,7 @@ body,
 }
 
 .active-project-listing {
-  height: fit-content;
+  max-height: 60vh;
   background-color: var(--day-shadow);
 }
 
