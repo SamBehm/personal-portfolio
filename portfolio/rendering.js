@@ -72,7 +72,7 @@ var textMeshes = {};
 
 var orbitObjects = [];
 var orbitDistance = { x: 500, y: 333 };
-var orbitSpeed = 500;
+var orbitSpeed = 1000;
 
 
 var day_pallete = {};
@@ -376,7 +376,7 @@ function generateOrbitObjects(numObjects) {
 function rotateOrbitObjects(orbitTick) {
         orbitObjects.forEach((object, i) => {
                 let origin = i * (2 * Math.PI) / orbitObjects.length;
-                let angle = (origin + (orbitTick / 20)) % (2 * Math.PI);
+                let angle = (origin + (orbitTick / orbitSpeed)) % (2 * Math.PI);
                 if (i % 2) {
                         object.position.x = Math.cos(angle) * orbitDistance.x;
                         object.position.y = Math.sin(angle) * orbitDistance.y;
@@ -385,8 +385,7 @@ function rotateOrbitObjects(orbitTick) {
                         object.position.y = Math.cos(angle) * orbitDistance.y;
                 }
 
-                object.position.z = Math.sin(origin + (orbitTick / 15) % (2 * Math.PI)) * orbitDistance.x;
-                object.rotation.x = (tick / 10) % (2 * Math.PI);
+                object.position.z = Math.cos(angle) * orbitDistance.x;
         });
 }
 
@@ -673,7 +672,7 @@ function checkHover() {
                 intersectedObjects = [];
 
                 if (hoverInteractEnabled) {
-                        orbitSpeed = intersectedObjects.length > 0 ? 0.5 : 1;
+                        orbitSpeed = intersectedObjects.length > 0 ? 1000 : 50;
                 }
 
         }
@@ -727,11 +726,12 @@ export function animate() {
                 tick = 0;
         }
 
-        tick++;
-
-        if (!(tick % orbitSpeed)) {
-                rotateOrbitObjects(tick / orbitSpeed);
+        if (!(tick % (orbitSpeed / 100))) {
+                rotateOrbitObjects(tick);
         }
+
+
+        tick++;
 
         renderer.render(scene, camera);
 
